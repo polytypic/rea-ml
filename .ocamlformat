@@ -1,0 +1,10 @@
+version=0.23.0
+
+module-item-spacing=compact
+
+space-around-arrays=false
+space-around-lists=false
+space-around-records=false
+space-around-variants=false
+
+cases-exp-indent=2

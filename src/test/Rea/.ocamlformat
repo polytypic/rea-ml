@@ -1,0 +1,3 @@
+# Preferring readability over compactness in tests that also serve as examples:
+if-then-else=k-r
+break-cases=toplevel

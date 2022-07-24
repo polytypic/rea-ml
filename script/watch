@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -eo pipefail
+
+SESSION=rea-ml
+
+DOCS=_build/default/_doc/_html/
+
+tmux start-server
+tmux new-session -d -s $SESSION
+
+tmux splitw -v -p 90
+tmux select-pane -t 0
+tmux splitw -h
+
+tmux select-pane -t 0
+tmux send-keys "npx livereload $DOCS --wait 250" C-m
+
+tmux select-pane -t 1
+tmux send-keys "python3 -m http.server 3000 --bind 127.0.0.1 --directory $DOCS" C-m
+
+tmux select-pane -t 2
+tmux send-keys "script/watch-test" C-m
+
+tmux attach-session -t $SESSION

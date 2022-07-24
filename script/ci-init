@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# shellcheck source=common
+. "${BASH_SOURCE%/*}/common"
+
+[ -f dune-project ] || echo '(lang dune 3.3)' > dune-project

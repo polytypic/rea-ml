@@ -1,0 +1,17 @@
+opam-version: "2.0"
+version: "0.1.0"
+synopsis: "Effectful OCaml with Objects and Variants"
+maintainer: "Vesa Karvonen <vesa.a.j.k@gmail.com>"
+authors: "Vesa Karvonen"
+license: "MIT"
+homepage: "https://github.com/polytypic/rea-ml"
+bug-reports: "https://github.com/polytypic/rea-ml/issues"
+dev-repo: "git+https://github.com/polytypic/rea-ml.git"
+depends: [
+  "dune"
+  "ocaml" {>= "4.08.0"}
+  "ppx_optcomp"
+  "ocamlformat" {dev}
+  "odoc" {dev}
+]
+build: ["dune" "build" "-p" name "-j" jobs]
