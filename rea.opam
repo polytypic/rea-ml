@@ -8,7 +8,7 @@ homepage: "https://github.com/polytypic/rea-ml"
 bug-reports: "https://github.com/polytypic/rea-ml/issues"
 dev-repo: "git+https://github.com/polytypic/rea-ml.git"
 depends: [
-  "dune"
+  "dune" {>= "3.3.0"}
   "ocaml" {>= "4.08.0"}
   "ppx_optcomp"
   "ocamlformat" {dev}
