@@ -10,7 +10,7 @@ dev-repo: "git+https://github.com/polytypic/rea-ml.git"
 depends: [
   "dune" {>= "3.3.0"}
   "ocaml" {>= "4.08.0"}
-  "ppx_optcomp"
+  "ppx_optcomp" {>= "v0.14.0"}
   "ocamlformat" {dev}
   "odoc" {dev}
 ]
