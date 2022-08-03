@@ -1,4 +1,3 @@
 (library
  (name Rea)
- (public_name rea)
  (preprocess (pps ppx_optcomp)))

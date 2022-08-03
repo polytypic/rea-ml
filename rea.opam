@@ -14,4 +14,3 @@ depends: [
   "ocamlformat" {= "0.23.0" & with-test}
   "odoc" {>= "2.1.1" & with-doc}
 ]
-build: ["dune" "build" "-p" name "-j" jobs]
