@@ -459,8 +459,8 @@ val if_else_s :
     branch
       (map const eE)
       (map const tE)
-      (map (function true  -> Left  ()
-                   | false -> Right ())
+      (map (function true  -> `Fst ()
+                   | false -> `Snd ())
            cE) ]} *)
 
 (** {3 Sequencing functors} *)
