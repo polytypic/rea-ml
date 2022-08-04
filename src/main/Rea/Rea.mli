@@ -11,7 +11,7 @@
     This brings binding operators, such as {!let*}, other operators, such as
     {!(>>=)}, as well as a large number of other combinators, such as {!bind},
     and types, such as {!bind'}, into scope.  The justification for this is that
-    they are generic, or polymorphic with respect to effect type constructor,
+    they are generic, or polymorphic with respect to the effect representation,
     and can easily subsume most other monadic libraries.  Entire applications
     can be written so that no other binding operators need to be used.
 
