@@ -39,3 +39,12 @@ parallel() {
     fi
   done
 }
+
+update-file-content() {
+  local FILE="$1"
+  local CONTENT="$2"
+  if ! [ -f "$FILE" ] || \
+      [ "$(cat "$FILE")" != "$CONTENT" ] ; then
+    echo "$CONTENT" > "$FILE"
+  fi
+}
