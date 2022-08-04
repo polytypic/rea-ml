@@ -7,6 +7,7 @@ main() {
   local TEST_DIR=src/test/Rea/
 
   extract-test-from-readme
+  extract-test-from-signature
   generate-build-files
   build-and-test
   if [ "$CI" = true ]; then
@@ -27,6 +28,20 @@ $(awk 'BEGIN {out=0}
       /^```ocaml$/ {out=1}
       /^```$/ {out=0}
       /^[^`].*/ {if (out) print $0}' < README.md \
+  | (cd "$TEST_DIR" && opam exec -- ocamlformat --impl -))"
+}
+
+extract-test-from-signature() {
+  update-file-content \
+    "$TEST_DIR/Signature.ml" \
+    "(* DO NOT EDIT! THIS IS AUTO EXTRACTED FROM THE SIGNATURE. *)
+
+[@@@ocaml.warning \"-32\"] (* Disable unused value warning. *)
+
+$(awk 'BEGIN {out=0}
+      /^{\[$/ {out=1}
+      /^\]}$/ {out=0}
+      /^[^{\]].*/ {if (out) print $0}' < src/main/Rea/Rea.mli \
   | (cd "$TEST_DIR" && opam exec -- ocamlformat --impl -))"
 }
 

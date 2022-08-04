@@ -1,4 +1,21 @@
-(** {b WARNING}: Many of the combinators are documented concisely in the format
+(** This is a framework for generic composable effectful asynchronous
+    programming basically using only objects and polymorphic variants.
+
+    This whole framework and module is really designed to allow it to be used by
+    opening the module:
+
+{[
+    open Rea
+]}
+
+    This brings binding operators, such as {!let*}, other operators, such as
+    {!(>>=)}, as well as a large number of other combinators, such as {!bind},
+    and types, such as {!bind'}, into scope.  The justification for this is that
+    they are generic, or polymorphic with respect to effect type constructor,
+    and can easily subsume most other monadic libraries.  Entire applications
+    can be written so that no other binding operators need to be used.
+
+    {b WARNING}: Many of the combinators are documented concisely in the format
     {i "[X] is equivalent to [Y]"}.  The equivalence should only be assumed to
     hold modulo more or less obvious OCaml evaluation order differences. *)
 
@@ -76,13 +93,13 @@ val eta'0 : (unit -> 'D -> 'a) -> 'D -> 'a
 
     Consider the following [fib] implementation:
 
-    {[
+{[
         let rec fib n = eta'0 @@ fun () ->
           if n <= 1 then
             pure n
           else
             lift'2 (+) (fib (n - 2)) (fib (n - 1))
-    ]}
+]}
 
     The [eta'0 @@ fun () -> ...] makes it so that [fib n] returns in O(1) time
     without building the complete computation tree. *)
@@ -92,14 +109,14 @@ val eta'1 : ('b1 -> 'd -> 'a) -> 'b1 -> 'd -> 'a
 
     Consider the following list traversal implementation:
 
-    {[
+{[
         let rec map_er xyE = eta'1 @@ function
           | [] -> pure []
           | x :: xs ->
             let+ y = xyE x
             and+ ys = map_er xyE xs in
             y :: ys
-    ]}
+]}
 
     The [eta'1 @@ function ...] makes it so that [map_er xyE xs] returns in O(1)
     time without going through the whole list to compute a complete computation
