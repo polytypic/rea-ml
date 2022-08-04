@@ -89,33 +89,33 @@ type ('R, 'e, 'a, 'D) er = 'D -> ('R, 'e, 'a) s
     the effects are really needed. *)
 
 val eta'0 : (unit -> 'D -> 'a) -> 'D -> 'a
-(** [eta'0 @@ fun () -> f] is equivalent to [fun d -> f d].
+(** [eta'0 @@ fun () -> body] is equivalent to [fun d -> body d].
 
     Consider the following [fib] implementation:
 
 {[
-        let rec fib n = eta'0 @@ fun () ->
-          if n <= 1 then
-            pure n
-          else
-            lift'2 (+) (fib (n - 2)) (fib (n - 1))
+    let rec fib n = eta'0 @@ fun () ->
+      if n <= 1 then
+        pure n
+      else
+        lift'2 (+) (fib (n - 2)) (fib (n - 1))
 ]}
 
     The [eta'0 @@ fun () -> ...] makes it so that [fib n] returns in O(1) time
     without building the complete computation tree. *)
 
 val eta'1 : ('b1 -> 'd -> 'a) -> 'b1 -> 'd -> 'a
-(** [eta'1 @@ fun x -> f] is equivalent to [fun x d -> f x d].
+(** [eta'1 fn] is equivalent to [fun x d -> fn x d].
 
     Consider the following list traversal implementation:
 
 {[
-        let rec map_er xyE = eta'1 @@ function
-          | [] -> pure []
-          | x :: xs ->
-            let+ y = xyE x
-            and+ ys = map_er xyE xs in
-            y :: ys
+    let rec map_er xyE = eta'1 @@ function
+      | [] -> pure []
+      | x :: xs ->
+        let+ y = xyE x
+        and+ ys = map_er xyE xs in
+        y :: ys
 ]}
 
     The [eta'1 @@ function ...] makes it so that [map_er xyE xs] returns in O(1)
@@ -123,7 +123,7 @@ val eta'1 : ('b1 -> 'd -> 'a) -> 'b1 -> 'd -> 'a
     tree for it. *)
 
 val eta'2 : ('b1 -> 'b2 -> 'd -> 'a) -> 'b1 -> 'b2 -> 'd -> 'a
-(** TODO *)
+(** [eta'2 fn] is equivalent to [fun x y d -> fn x y d]. *)
 
 (** {3 Running} *)
 
@@ -673,12 +673,12 @@ val map_error :
   ('f -> 'e) ->
   ('R, 'f, 'a, (< ('R, 'D) pure' ; ('R, 'D) errors' ; .. > as 'D)) er ->
   ('R, 'e, 'a, 'D) er
-(** TODO *)
+(** [map_error fe xE] is equivalent to [tryin (fun f -> fail (fe e)) pure xE]. *)
 
 val gen_error :
   ('R, nothing, 'a, (< ('R, 'D) pure' ; ('R, 'D) errors' ; .. > as 'D)) er ->
   ('R, 'e, 'a, 'D) er
-(** TODO *)
+(** [gen_error xE] is equivalent to [map_error (function (_: nothing) -> .) xE]. *)
 
 (** {3 Asynchronicity} *)
 
