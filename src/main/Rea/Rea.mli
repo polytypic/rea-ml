@@ -143,6 +143,13 @@ class virtual ['R, 'D] map' :
     (** Implements the {!map} capability. *)
   end
 
+(** TODO *)
+class ['R, 'O, 'D] map'of :
+  ('R, 'O) #map'
+  -> object ('D)
+       method map' : ('R, 'e, 'a, 'b, 'D) map'm
+     end
+
 (** Functor offers the {!map} capability. *)
 class virtual ['R, 'D] functr' :
   object
@@ -184,12 +191,27 @@ class virtual ['R, 'D] pure' :
     (** Implements the {!pure} capability. *)
   end
 
+(** TODO *)
+class ['R, 'O, 'D] pure'of :
+  ('R, 'O) #pure'
+  -> object ('D)
+       method pure' : ('R, 'e, 'a, 'D) pure'm
+     end
+
 (** Pointed functor offers the {!map}, and {!pure} capabilities. *)
 class virtual ['R, 'D] pointed' :
   object
     inherit ['R, 'D] map'
     inherit ['R, 'D] pure'
   end
+
+(** TODO *)
+class ['R, 'O, 'D] pointed'of :
+  ('R, 'O) #pointed'
+  -> object ('D)
+       method map' : ('R, 'e, 'a, 'b, 'D) map'm
+       method pure' : ('R, 'e, 'a, 'D) pure'm
+     end
 
 val pure : 'a -> ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
 (** [pure value] effect. *)
@@ -219,12 +241,27 @@ class virtual ['R, 'D] pair' :
     (** Implements the {!pair} capability. *)
   end
 
+(** TODO *)
+class ['R, 'O, 'D] pair'of :
+  ('R, 'O) #pair'
+  -> object ('D)
+       method pair' : ('R, 'e, 'a, 'b, 'D) pair'm
+     end
+
 (** Product functor offers the {!map}, and {!pair} capabilities. *)
 class virtual ['R, 'D] product' :
   object
     inherit ['R, 'D] map'
     inherit ['R, 'D] pair'
   end
+
+(** TODO *)
+class ['R, 'O, 'D] product'of :
+  ('R, 'O) #product'
+  -> object ('D)
+       method map' : ('R, 'e, 'a, 'b, 'D) map'm
+       method pair' : ('R, 'e, 'a, 'b, 'D) pair'm
+     end
 
 (** Applicative functor offers the {!map}, {!pure}, and {!pair}
     capabilities. *)
@@ -233,6 +270,15 @@ class virtual ['R, 'D] applicative' :
     inherit ['R, 'D] pointed'
     inherit ['R, 'D] pair'
   end
+
+(** TODO *)
+class ['R, 'O, 'D] applicative'of :
+  ('R, 'O) #applicative'
+  -> object ('D)
+       method map' : ('R, 'e, 'a, 'b, 'D) map'm
+       method pure' : ('R, 'e, 'a, 'D) pure'm
+       method pair' : ('R, 'e, 'a, 'b, 'D) pair'm
+     end
 
 val pair :
   ('R, 'e, 'a, (('R, 'D) #pair' as 'D)) er ->
@@ -451,6 +497,13 @@ class virtual ['R, 'D] branch' :
     (** Implements the {!val-branch} capability. *)
   end
 
+(** TODO *)
+class ['R, 'O, 'D] branch'of :
+  ('R, 'O) #branch'
+  -> object ('D)
+       method branch' : ('R, 'e, 'a, 'b, 'c, 'D) branch'm
+     end
+
 (** Selective functor offers the {!map}, {!pure}, {!pair}, and {!val-branch}
     capabilities. *)
 class virtual ['R, 'D] selective' :
@@ -458,6 +511,16 @@ class virtual ['R, 'D] selective' :
     inherit ['R, 'D] applicative'
     inherit ['R, 'D] branch'
   end
+
+(** TODO *)
+class ['R, 'O, 'D] selective'of :
+  ('R, 'O) #selective'
+  -> object ('D)
+       method map' : ('R, 'e, 'a, 'b, 'D) map'm
+       method pure' : ('R, 'e, 'a, 'D) pure'm
+       method pair' : ('R, 'e, 'a, 'b, 'D) pair'm
+       method branch' : ('R, 'e, 'a, 'b, 'c, 'D) branch'm
+     end
 
 val branch :
   ('R, 'e, 'b -> 'a, 'D) er ->
@@ -493,6 +556,13 @@ class virtual ['R, 'D] bind' :
     (** Implements the {!bind} capability. *)
   end
 
+(** TODO *)
+class ['R, 'O, 'D] bind'of :
+  ('R, 'O) #bind'
+  -> object ('D)
+       method bind' : ('R, 'e, 'a, 'b, 'D) bind'm
+     end
+
 (** Monad offers the {!map}, {!pure}, {!pair}, {!val-branch}, and {!bind}
     capabilities. *)
 class virtual ['R, 'D] monad' :
@@ -500,6 +570,17 @@ class virtual ['R, 'D] monad' :
     inherit ['R, 'D] selective'
     inherit ['R, 'D] bind'
   end
+
+(** TODO *)
+class ['R, 'O, 'D] monad'of :
+  ('R, 'O) #monad'
+  -> object ('D)
+       method map' : ('R, 'e, 'a, 'b, 'D) map'm
+       method pure' : ('R, 'e, 'a, 'D) pure'm
+       method pair' : ('R, 'e, 'a, 'b, 'D) pair'm
+       method branch' : ('R, 'e, 'a, 'b, 'c, 'D) branch'm
+       method bind' : ('R, 'e, 'a, 'b, 'D) bind'm
+     end
 
 (** Implements defaults for {!map}, {!pair}, and {!val-branch} in terms of
     {!pure} and {!bind}. *)
@@ -571,6 +652,13 @@ class virtual ['R, 'D] zero' :
     (** Implements the {!zero} capability. *)
   end
 
+(** TODO *)
+class ['R, 'O, 'D] zero'of :
+  ('R, 'O) #zero'
+  -> object ('D)
+       method zero' : ('R, 'e, 'a, 'D) zero'm
+     end
+
 type ('R, 'e, 'a, 'D) alt'm =
   ('R, 'e, 'a, 'D) er -> ('R, 'e, 'a, 'D) er -> ('R, 'e, 'a) s
 (** {!alt} effect signature. *)
@@ -582,12 +670,27 @@ class virtual ['R, 'D] alt' :
     (** Implements the {!alt} capability. *)
   end
 
+(** TODO *)
+class ['R, 'O, 'D] alt'of :
+  ('R, 'O) #alt'
+  -> object ('D)
+       method alt' : ('R, 'e, 'a, 'D) alt'm
+     end
+
 (** Plus offers the {!zero} and {!alt} capabilities. *)
 class virtual ['R, 'D] plus' :
   object
     inherit ['R, 'D] zero'
     inherit ['R, 'D] alt'
   end
+
+(** TODO *)
+class ['R, 'O, 'D] plus'of :
+  ('R, 'O) #plus'
+  -> object ('D)
+       method zero' : ('R, 'e, 'a, 'D) zero'm
+       method alt' : ('R, 'e, 'a, 'D) alt'm
+     end
 
 val zero : ('R, 'e, 'a, (('R, 'D) #zero' as 'D)) er
 (** [zero] effect. *)
@@ -620,6 +723,13 @@ class virtual ['R, 'D] fail' :
     (** Implements the {!fail} capability. *)
   end
 
+(** TODO *)
+class virtual ['R, 'O, 'D] fail'of :
+  ('R, 'O) #fail'
+  -> object ('D)
+       method fail' : ('R, 'e, 'a, 'D) fail'm
+     end
+
 type ('R, 'e, 'f, 'a, 'b, 'D) tryin'm =
   ('f -> ('R, 'e, 'a, 'D) er) ->
   ('b -> ('R, 'e, 'a, 'D) er) ->
@@ -634,12 +744,27 @@ class virtual ['R, 'D] tryin' :
     (** Implements the {!tryin} capability. *)
   end
 
+(** TODO *)
+class virtual ['R, 'O, 'D] tryin'of :
+  ('R, 'O) #tryin'
+  -> object ('D)
+       method tryin' : ('R, 'e, 'f, 'a, 'b, 'D) tryin'm
+     end
+
 (** Error handling offers the {!fail}, and {!tryin}. *)
 class virtual ['R, 'D] errors' :
   object
     inherit ['R, 'D] fail'
     inherit ['R, 'D] tryin'
   end
+
+(** TODO *)
+class virtual ['R, 'O, 'D] errors'of :
+  ('R, 'O) #errors'
+  -> object ('D)
+       method fail' : ('R, 'e, 'a, 'D) fail'm
+       method tryin' : ('R, 'e, 'f, 'a, 'b, 'D) tryin'm
+     end
 
 val fail : 'e -> ('R, 'e, 'a, (('R, 'D) #fail' as 'D)) er
 (** [fail error] effect. *)
@@ -691,6 +816,13 @@ class virtual ['R, 'D] par' :
     method virtual par' : 'e 'a 'b. ('R, 'e, 'a, 'b, 'D) par'm
   end
 
+(** TODO *)
+class ['R, 'O, 'D] par'of :
+  ('R, 'O) #par'
+  -> object ('D)
+       method par' : ('R, 'e, 'a, 'b, 'D) par'm
+     end
+
 val par :
   ('R, 'e, 'a, (('R, 'D) #par' as 'D)) er ->
   ('R, 'e, 'b, 'D) er ->
@@ -707,6 +839,13 @@ class virtual ['R, 'D] suspend' :
     (** Implements the {!suspend} capability. *)
   end
 
+(** TODO *)
+class ['R, 'O, 'D] suspend'of :
+  ('R, 'O) #suspend'
+  -> object ('D)
+       method suspend' : ('R, 'e, 'a, 'D) suspend'm
+     end
+
 val suspend :
   (('e, 'a) res, unit) cps -> ('R, 'e, 'a, (('R, 'D) #suspend' as 'D)) er
 (** [suspend with_resume] effect. *)
@@ -721,11 +860,31 @@ class virtual ['R, 'D] spawn' :
   end
 
 (** TODO *)
+class ['R, 'O, 'D] spawn'of :
+  ('R, 'O) #spawn'
+  -> object ('D)
+       method spawn' : ('R, 'e, 'D) spawn'm
+     end
+
+(** TODO *)
 class virtual ['R, 'D] sync' :
   object
     inherit ['R, 'D] monad'
     inherit ['R, 'D] errors'
   end
+
+(** TODO *)
+class ['R, 'O, 'D] sync'of :
+  ('R, 'O) #sync'
+  -> object ('D)
+       method map' : ('R, 'e, 'a, 'b, 'D) map'm
+       method pure' : ('R, 'e, 'a, 'D) pure'm
+       method pair' : ('R, 'e, 'a, 'b, 'D) par'm
+       method branch' : ('R, 'e, 'a, 'b, 'c, 'D) branch'm
+       method bind' : ('R, 'e, 'a, 'b, 'D) bind'm
+       method fail' : ('R, 'e, 'a, 'D) fail'm
+       method tryin' : ('R, 'e, 'f, 'a, 'b, 'D) tryin'm
+     end
 
 (** TODO *)
 class virtual ['R, 'D] async' :
@@ -735,6 +894,22 @@ class virtual ['R, 'D] async' :
     inherit ['R, 'D] par'
     inherit ['R, 'D] spawn'
   end
+
+(** TODO *)
+class ['R, 'O, 'D] async'of :
+  ('R, 'O) #async'
+  -> object ('D)
+       method map' : ('R, 'e, 'a, 'b, 'D) map'm
+       method pure' : ('R, 'e, 'a, 'D) pure'm
+       method pair' : ('R, 'e, 'a, 'b, 'D) par'm
+       method branch' : ('R, 'e, 'a, 'b, 'c, 'D) branch'm
+       method bind' : ('R, 'e, 'a, 'b, 'D) bind'm
+       method fail' : ('R, 'e, 'a, 'D) fail'm
+       method tryin' : ('R, 'e, 'f, 'a, 'b, 'D) tryin'm
+       method par' : ('R, 'e, 'a, 'b, 'D) par'm
+       method spawn' : ('R, 'e, 'D) spawn'm
+       method suspend' : ('R, 'e, 'a, 'D) suspend'm
+     end
 
 val spawn :
   ('R, nothing, unit, (('R, 'D) #spawn' as 'D)) er -> ('R, 'e, unit, 'D) er

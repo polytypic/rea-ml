@@ -4,6 +4,7 @@ let prop = Prop.make
 
 include Signatures
 include Derived
+include Projections
 include Combinators
 module Constant = Constant
 module Identity = Identity
