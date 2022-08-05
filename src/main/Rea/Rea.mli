@@ -721,10 +721,16 @@ class virtual ['R, 'D] spawn' :
   end
 
 (** TODO *)
-class virtual ['R, 'D] async' :
+class virtual ['R, 'D] sync' :
   object
     inherit ['R, 'D] monad'
     inherit ['R, 'D] errors'
+  end
+
+(** TODO *)
+class virtual ['R, 'D] async' :
+  object
+    inherit ['R, 'D] sync'
     inherit ['R, 'D] suspend'
     inherit ['R, 'D] par'
     inherit ['R, 'D] spawn'

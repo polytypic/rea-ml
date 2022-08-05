@@ -75,7 +75,7 @@ module Num = struct
            as
            'e),
           'v,
-          (< ('R, 'D) monad' ; ('R, 'D) errors' ; .. > as 'D) )
+          (< ('R, 'D) sync' ; .. > as 'D) )
         er) ->
         [< 't t] ->
         ('R, 'e, [> `Num of int], 'D) er)
@@ -125,7 +125,7 @@ module Lam = struct
            as
            'e),
           'v,
-          (< ('R, 'D) monad' ; ('R, 'D) errors' ; 'v bindings ; .. > as 'D) )
+          (< ('R, 'D) sync' ; 'v bindings ; .. > as 'D) )
         er) ->
         [< 't t] ->
         ('R, 'e, 'v, 'D) er)
@@ -146,8 +146,7 @@ module Full = struct
           | `Error_attempt_to_apply_uop of [`Neg] * 'v
           | `Error_unbound_var of Lam.Id.t ],
           'v,
-          (< ('R, 'D) monad' ; ('R, 'D) fail' ; 'v Lam.bindings ; .. > as 'D)
-        )
+          (< ('R, 'D) sync' ; 'v Lam.bindings ; .. > as 'D) )
         er)
 end
 

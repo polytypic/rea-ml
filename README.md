@@ -315,8 +315,8 @@ applicative pairing of computation.
 Errors are reported with the `fail` combinator. We use polymorphic variants for
 errors.
 
-After a bit of cleaning up, the type inferred for `eval` is roughly equivalent
-to the following definition:
+After some cleaning up, the type inferred for `eval` is roughly equivalent to
+the following definition:
 
 ```ocaml
   let _ =
@@ -329,7 +329,7 @@ to the following definition:
            as
            'e),
           'v,
-          (< ('R, 'D) monad' ; ('R, 'D) errors' ; .. > as 'D) )
+          (< ('R, 'D) sync' ; .. > as 'D) )
         er) ->
         [< 't t] ->
         ('R, 'e, [> `Num of int], 'D) er)
@@ -338,6 +338,10 @@ end
 
 Notice that the above type shows both of the errors that might arise from
 `eval`.
+
+The `sync'` class is a combination of `monad'` and `errors'` and `errors'` is a
+combination of`fail'` and `tryin'`. In other words, it provides both the basic
+monadic capabilities for sequencing and the ability to signal and handle errors.
 
 Let's then move on to implement (lambda) λ-expressions:
 
@@ -420,7 +424,7 @@ The following definition shows a cleaned up type for the `eval` function:
            as
            'e),
           'v,
-          (< ('R, 'D) monad' ; ('R, 'D) errors' ; 'v bindings ; .. > as 'D) )
+          (< ('R, 'D) sync' ; 'v bindings ; .. > as 'D) )
         er) ->
         [< 't t] ->
         ('R, 'e, 'v, 'D) er)
@@ -457,8 +461,7 @@ Again, here is a cleaned up type for the `eval` function:
           | `Error_attempt_to_apply_uop of [`Neg] * 'v
           | `Error_unbound_var of Lam.Id.t ],
           'v,
-          (< ('R, 'D) monad' ; ('R, 'D) fail' ; 'v Lam.bindings ; .. > as 'D)
-        )
+          (< ('R, 'D) sync' ; 'v Lam.bindings ; .. > as 'D) )
         er)
 end
 ```
@@ -471,10 +474,9 @@ Notice how the type combines
 - the capability dictionaries (as `'D`).
 
 To actually run `eval` we will need an effect interpreter that provides the
-`monad'` and `error'` capabilities as well as `bindings`. There is an
-interpreter for the standard `result` type that we can use for the `monad'` and
-`errors'` capabilities. For the `bindings` we can just use `bindings`. Here is
-how:
+`sync'` capabilities as well as `bindings`. There is an interpreter for the
+standard `result` type that we can use for the `sync'` capabilities. For the
+`bindings` we can just use `bindings`. Here is how:
 
 ```ocaml
 let () =
@@ -490,9 +492,9 @@ let () =
               (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "y")), `Num 1)))))
 ```
 
-Another interpreter that comes bundled with the Rea framework that provides both
-`monad'` and `errors'` is the `Tailrec` interpreter we used previously. So, we
-could also use `Tailrec` as follows:
+Another interpreter that comes bundled with the Rea framework that provides
+`sync'` is the `Tailrec` interpreter we used previously. So, we could also use
+`Tailrec` as follows:
 
 ```ocaml
 let () =
