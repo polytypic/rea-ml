@@ -18,18 +18,20 @@ Features:
 
 More specifically, this uses a
 [tagless-final approach](https://okmij.org/ftp/tagless-final/course/optimizations.html#primer)
-with the signatures specified using objects and a
+with the signatures specified using object types and a
 [higher-kinded type encoding](https://github.com/ocamllabs/higher). Programs can
 be written against abstract generic interfaces allowing the same program to be
 executed with multiple interpreters. Interpreters are implemented as objects and
-passed via the reader pattern. Polymorphic variants can be used for errors. The
-end result is a system that provides a variety of effects (environment, checked
-exceptions, asynchronicity, ...) _à la carte_.
+[passed via the reader pattern](https://www.haskellforall.com/2012/05/scrap-your-type-classes.html?showComment=1338305803531#c5117471807774445845).
+Polymorphic variants can be used for errors. The end result is a system that
+provides a variety of effects (environment, checked exceptions, asynchronicity,
+...) _à la carte_.
 
 This library requires OCaml version 4.08 or later for
 [binding operators](https://v2.ocaml.org/manual/bindingops.html) and some other
 convenience features, but it seems a library like this could have already been
-written for OCaml 3.
+written for OCaml 3 (released in 2000). All the elements of this approach have
+been known at least since 2014.
 
 ## Introduction
 
@@ -39,6 +41,13 @@ examples. The code snippets are also extracted as a
 
 ### Basics
 
+To begin, we just `open` the `Rea` module, which brings a lot of generic
+combinators to scope:
+
+```ocaml
+open Rea
+```
+
 Let's look at a rather familiar example, the implementation of a naïve
 exponential time Fibonacci function as an effectful computation. We use such a
 trivial example in order to focus on some of the basics of the Rea framework. It
@@ -47,22 +56,19 @@ not, rest assured, there is
 [no shortage of material introducing monads](https://wiki.haskell.org/Monad_tutorials_timeline)
 on the Internet.
 
-To use the framework, we just `open` the `Rea` module, which brings a lot of
-generic combinators to scope:
-
 ```ocaml
-open Rea
+module Fib = struct
 ```
 
 And here is a naïvely written eager Fibonacci function implementation using the
 `pure` and `lift'2` combinators from the framework:
 
 ```ocaml
-let rec eager_fib n =
-  if n <= 1 then
-    pure n
-  else
-    lift'2 ( + ) (eager_fib (n - 2)) (eager_fib (n - 1))
+  let rec eager n =
+    if n <= 1 then
+      pure n
+    else
+      lift'2 ( + ) (eager (n - 2)) (eager (n - 1))
 ```
 
 The `pure` aka `return` combinator should already be familiar to you. The
@@ -71,22 +77,22 @@ function of two plain value arguments and returns a function that works on
 effectful computations. In this case, the `+` operator is used to combine the
 results of the two recursive Fibonacci computations as a computation.
 
-The below definition shows the type inferred for `eager_fib` (after renaming
-some type variables to match what is used in the Rea framework):
+The below definition shows the type inferred for `eager` (after renaming some
+type variables to match what is used in the Rea framework):
 
 ```ocaml
-let _ =
-  (eager_fib
-    : int ->
-      (< map' : 'e 'a 'b. ('b -> 'a) -> ('R, 'e, 'b, 'D) er -> ('R, 'e, 'a) s
-       ; pair' :
-           'e 'a 'b.
-           ('R, 'e, 'a, 'D) er -> ('R, 'e, 'b, 'D) er -> ('R, 'e, 'a * 'b) s
-       ; pure' : 'e 'a. 'a -> ('R, 'e, 'a) s
-       ; .. >
-       as
-       'D) ->
-      ('R, 'e, int) s)
+  let _ =
+    (eager
+      : int ->
+        (< map' : 'e 'a 'b. ('b -> 'a) -> ('R, 'e, 'b, 'D) er -> ('R, 'e, 'a) s
+         ; pair' :
+             'e 'a 'b.
+             ('R, 'e, 'a, 'D) er -> ('R, 'e, 'b, 'D) er -> ('R, 'e, 'a * 'b) s
+         ; pure' : 'e 'a. 'a -> ('R, 'e, 'a) s
+         ; .. >
+         as
+         'D) ->
+        ('R, 'e, int) s)
 ```
 
 The above undoubtedly looks rather complicated. We can simplify it by using type
@@ -96,11 +102,11 @@ above are defined by classes of the same name and each of those classes takes
 two type parameters `('R, 'D)`:
 
 ```ocaml
-let _ =
-  (eager_fib
-    : int ->
-      (< ('R, 'D) map' ; ('R, 'D) pair' ; ('R, 'D) pure' ; .. > as 'D) ->
-      ('R, 'e, int) s)
+  let _ =
+    (eager
+      : int ->
+        (< ('R, 'D) map' ; ('R, 'D) pair' ; ('R, 'D) pure' ; .. > as 'D) ->
+        ('R, 'e, int) s)
 ```
 
 The curious recursive use of the `'D` type parameter makes sure that all of the
@@ -114,8 +120,8 @@ there to allow the classes to be conveniently at the top level of the `Rea`
 module with reduced risk of naming collisions with other libraries.
 
 Recall that we used two combinators `pure` and `lift'2` from the framework in
-the `eager_fib` function. Obviously `pure` corresponds to or requires the
-`pure'` class. `lift'2` requires both of the `map'` and `pair'` classes. OCaml
+the `eager` function. Obviously `pure` corresponds to or requires the `pure'`
+class. `lift'2` requires both of the `map'` and `pair'` classes. OCaml
 conveniently infers the required combination for us.
 
 We can simplify the type further. The combination of `map'`, `pair'`, and
@@ -124,7 +130,7 @@ applicative functor. The Rea library defines the abbreviation `applicative'` (as
 a class) for the combination:
 
 ```ocaml
-let _ = (eager_fib : int -> (('R, 'D) #applicative' as 'D) -> ('R, 'e, int) s)
+  let _ = (eager : int -> (('R, 'D) #applicative' as 'D) -> ('R, 'e, int) s)
 ```
 
 We are not quite done yet. Ignore the `int ->`. The remaining part of the type
@@ -135,7 +141,7 @@ return effect readers as results. So, we end up with the following equivalent
 type:
 
 ```ocaml
-let _ = (eager_fib : int -> ('R, 'e, int, (('R, 'D) #applicative' as 'D)) er)
+  let _ = (eager : int -> ('R, 'e, int, (('R, 'D) #applicative' as 'D)) er)
 ```
 
 Let's discuss the general form of the effect reader type `('R, 'e, 'a, 'D) er`.
@@ -161,7 +167,7 @@ constructor to the `'e` and `'a` arguments.
 Now, let's interpret the effect reader type of our Fibonacci function:
 
 ```ml
-('R, 'e, int, (('R, 'D) #applicative' as 'D)) er
+  ('R, 'e, int, (('R, 'D) #applicative' as 'D)) er
 ```
 
 First of all, we can see that it returns an `int` in case it does not fail with
@@ -178,7 +184,7 @@ For example, we can use the identity monad implementation provided by the Rea
 framework:
 
 ```ocaml
-let () = assert (55 = Identity.of_rea (run Identity.monad (eager_fib 10)))
+  let () = assert (55 = Identity.of_rea (run Identity.monad (eager 10)))
 ```
 
 The identity monad does not perform any effects per se and the values computed
@@ -190,7 +196,7 @@ nor it can support asynchronous computations. It may seem like a useless
 interpreter, but it actually has many interesting applications.
 
 The `run` function used above just passes the interpreter to the computation.
-One could also just write `eager_fib 10 Identity.monad`.
+One could also just write `eager 10 Identity.monad`.
 
 We can also use the self tail recursive (and
 [Js_of_ocaml](https://ocsigen.org/js_of_ocaml/latest/manual/overview)
@@ -198,7 +204,7 @@ We can also use the self tail recursive (and
 provided by the Rea framework:
 
 ```ocaml
-let () = assert (`Ok 55 = Tailrec.run Tailrec.sync (eager_fib 10))
+  let () = assert (`Ok 55 = Tailrec.run Tailrec.sync (eager 10))
 ```
 
 The tail recursive interpreter provides both a synchronous, as seen above, and
@@ -206,41 +212,41 @@ an asynchronous interpreter and also supports error handling. The Rea framework
 also provides a number of other interpreter implementations, that we could use
 here, but let's move on.
 
-At the beginning we mentioned that the `eager_fib` function is written naïvely.
-The problem with it is that it is eager: as soon as the first argument is passed
-to it, a whole tree of suspended computations is built.
+At the beginning we mentioned that the `eager` function is written naïvely. The
+problem with it is that it is eager: as soon as the first argument is passed to
+it, a whole tree of suspended computations is built.
 
-Now, we saw that the result of `eager_fib n` is actually a function &mdash;
-namely an effect reader. Because it is a function, we can use (eta) η-expansion
-to make it lazy. For this purpose the Rea framework provides a simple `eta'0`
-function that takes a thunk and returns a single parameter function. Using
-`eta'0` we can write an η-expanded Fibonacci function as follows:
+Now, we saw that the result of `eager n` is actually a function &mdash; namely
+an effect reader. Because it is a function, we can use (eta) η-expansion to make
+it lazy. For this purpose the Rea framework provides a simple `eta'0` function
+that takes a thunk and returns a single parameter function. Using `eta'0` we can
+write an η-expanded Fibonacci function as follows:
 
 ```ocaml
-let rec fib n = eta'0 @@ fun () ->
-  if n <= 1 then
-    pure n
-  else
-    lift'2 ( + ) (fib (n - 2)) (fib (n - 1))
+  let rec inert n = eta'0 @@ fun () ->
+    if n <= 1 then
+      pure n
+    else
+      lift'2 ( + ) (inert (n - 2)) (inert (n - 1))
 ```
 
-The `fib` and `eager_fib` functions have exactly the same types. The difference
-is that the η-expanded `fib` function returns in O(1) time with a function
+The `inert` and `eager` functions have exactly the same types. The difference is
+that the η-expanded `inert` function returns in O(1) time with a function
 
 ```ml
-fib n = fun d -> ...
+  inert n = fun d -> ...
 ```
 
-while the `eager_fib` function builds a complete computation tree
+while the `eager` function builds a complete computation tree
 
 ```ml
-eager_fib 0 = pure 0
-eager_fib 1 = pure 1
-eager_fib 2 = lift'2 (+) (pure 0) (pure 1)
-eager_fib 3 = lift'2 (+) (pure 1) (lift'2 (+) (pure 0) (pure 1))
-eager_fib 4 = lift'2 (+) (lift'2 (+) (pure 0) (pure 1))
-                         (lift'2 (+) (pure 1) (lift'2 (+) (pure 0) (pure 1)))
-...
+  eager 0 = pure 0
+  eager 1 = pure 1
+  eager 2 = lift'2 (+) (pure 0) (pure 1)
+  eager 3 = lift'2 (+) (pure 1) (lift'2 (+) (pure 0) (pure 1))
+  eager 4 = lift'2 (+) (lift'2 (+) (pure 0) (pure 1))
+                           (lift'2 (+) (pure 1) (lift'2 (+) (pure 0) (pure 1)))
+  ...
 ```
 
 taking exponential time and space.
@@ -250,17 +256,22 @@ exponential time due to the naïve exponential Fibonacci algorithm. Again, the
 difference is that one of the computations is generated lazily on demand while
 the other is generated eagerly.
 
-Just like with the previous `eager_fib`, we can use multiple interpreters to run
-`fib` computations:
+Just like with the previous `eager`, we can use multiple interpreters to run
+`inert` computations:
 
 ```ocaml
-let () = assert (55 = Identity.of_rea (run Identity.monad (fib 10)))
-let () = assert (`Ok 55 = Tailrec.run Tailrec.sync (fib 10))
+  let () = assert (55 = Identity.of_rea (run Identity.monad (inert 10)))
+  let () = assert (`Ok 55 = Tailrec.run Tailrec.sync (inert 10))
 ```
 
-This concludes the Fibonacci example. We now have a basic understanding of
-effect readers. They are just functions that take a dictionary of capabilities
-aka an interpreter as an argument.
+This concludes the Fibonacci example.
+
+```ocaml
+end
+```
+
+We now have a basic understanding of effect readers. They are just functions
+that take a dictionary of capabilities aka an interpreter as an argument.
 
 ### Extensible environment
 
@@ -273,6 +284,11 @@ First we'll implement a simple arithmetic language:
 
 ```ocaml
 module Num = struct
+```
+
+For later use, we'll define a structural type matching the arithmetic language:
+
+```ocaml
   type 't t =
     [`Num of int | `Uop of [`Neg] * 't | `Bop of [`Add | `Mul] * 't * 't]
 ```
@@ -333,7 +349,6 @@ the following definition:
         er) ->
         [< 't t] ->
         ('R, 'e, [> `Num of int], 'D) er)
-end
 ```
 
 Notice that the above type shows both of the errors that might arise from
@@ -343,10 +358,19 @@ The `sync'` class is a combination of `monad'` and `errors'` and `errors'` is a
 combination of`fail'` and `tryin'`. In other words, it provides both the basic
 monadic capabilities for sequencing and the ability to signal and handle errors.
 
+```ocaml
+end
+```
+
 Let's then move on to implement (lambda) λ-expressions:
 
 ```ocaml
 module Lam = struct
+```
+
+Like with the arithmetic language we define a type for the language:
+
+```ocaml
   module Id = String
 
   type 't t = [`Lam of Id.t * 't | `App of 't * 't | `Var of Id.t]
@@ -428,12 +452,15 @@ The following definition shows a cleaned up type for the `eval` function:
         er) ->
         [< 't t] ->
         ('R, 'e, 'v, 'D) er)
-end
 ```
 
 Notice the `bindings` as part of the `'D` dictionary of capabilities.
 
-To compose the full interpreter
+```ocaml
+end
+```
+
+Moving on to compose the full interpreter
 
 ```ocaml
 module Full = struct
@@ -463,7 +490,6 @@ Again, here is a cleaned up type for the `eval` function:
           'v,
           (< ('R, 'D) sync' ; 'v Lam.bindings ; .. > as 'D) )
         er)
-end
 ```
 
 Notice how the type combines
@@ -479,17 +505,16 @@ standard `result` type that we can use for the `sync'` capabilities. For the
 `bindings` we can just use `bindings`. Here is how:
 
 ```ocaml
-let () =
-  assert (
-    Error (`Error_unbound_var "y")
-    = StdRea.Result.of_rea
-        (run
-           (object
-              inherit [_] StdRea.Result.monad_errors
-              inherit [_] Lam.bindings
-           end)
-           (Full.eval
-              (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "y")), `Num 1)))))
+  let () =
+    assert (
+      Error (`Error_unbound_var "y")
+      = StdRea.Result.of_rea
+          (run
+             (object
+                inherit [_] StdRea.Result.monad_errors
+                inherit [_] Lam.bindings
+             end)
+             (eval (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "y")), `Num 1)))))
 ```
 
 Another interpreter that comes bundled with the Rea framework that provides
@@ -497,15 +522,15 @@ Another interpreter that comes bundled with the Rea framework that provides
 `Tailrec` as follows:
 
 ```ocaml
-let () =
-  assert (
-    `Ok (`Num 3)
-    = Tailrec.run
-        (object
-           inherit [_] Tailrec.sync
-           inherit [_] Lam.bindings
-        end)
-        (Full.eval (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "x")), `Num 1))))
+  let () =
+    assert (
+      `Ok (`Num 3)
+      = Tailrec.run
+          (object
+             inherit [_] Tailrec.sync
+             inherit [_] Lam.bindings
+          end)
+          (eval (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "x")), `Num 1))))
 ```
 
 We could also use the asynchronous version of the `Tailrec` interpreter. To
@@ -514,18 +539,18 @@ ensure that neither errors nor results are implicitly ignored, the
 returns `()`. We need to wrap the computation with handlers:
 
 ```ocaml
-let () =
-  let result = ref @@ Ok (`Num 0) in
-  Tailrec.spawn
-    (object
-       inherit [_] Tailrec.async
-       inherit [_] Lam.bindings
-    end)
-    (Full.eval (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "x")), `Num 1))
-    |> tryin
-         (fun e -> pure (result := Error e))
-         (fun v -> pure (result := Ok v)));
-  assert (!result = Ok (`Num 3))
+  let () =
+    let result = ref @@ Ok (`Num 0) in
+    Tailrec.spawn
+      (object
+         inherit [_] Tailrec.async
+         inherit [_] Lam.bindings
+      end)
+      (eval (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "x")), `Num 1))
+      |> tryin
+           (fun e -> pure (result := Error e))
+           (fun v -> pure (result := Ok v)));
+    assert (!result = Ok (`Num 3))
 ```
 
 The `tryin` combinator allows us to handle errors and continue with results.
@@ -535,6 +560,10 @@ becomes parametric and can be unified with `nothing`.
 Normally one cannot assume that a computation started with `Tailrec.spawn`
 completes immediately. In this case we had nothing asynchronous in the
 implementation and nothing asynchronous running in the background.
+
+```ocaml
+end
+```
 
 This concludes the example. We now know about the extensible environment as well
 as about error handling.
@@ -561,13 +590,16 @@ such a form of polymorphism. What can we do?
 
 OCaml does offer half of what we need: we can declare that we need at least some
 specific capabilities from the environment. What we can do then is to project
-those capabilities out of the environment and build our own local environment.
-
-Let's see how that is done. Here is a "closed" `eval` function that does not
-require bindings from the environment:
+those capabilities out of the environment and build our own scoped environment.
 
 ```ocaml
-module Closed = struct
+module Scoped = struct
+```
+
+Let's see how that is done. Here is an `eval` function that does not require
+`bindings` from the environment:
+
+```ocaml
   let eval e =
     Full.eval e
     |> mapping_env @@ fun o ->
@@ -579,8 +611,9 @@ module Closed = struct
 
 The `sync'of` class used above is given an object that must be of some subtype
 of `sync'`. It then provides the `sync'` capabilities by delegating to the given
-object. The `mapping_env` combinator allows us to get the outer environment `o`
-and substitute our own.
+object. In other words, it projects the `sync'` capability from the environment.
+The `mapping_env` combinator allows us to get the outer environment `o` and
+substitute our own.
 
 The following definition shows a cleaned up type for the closed `eval`:
 
@@ -597,27 +630,29 @@ The following definition shows a cleaned up type for the closed `eval`:
           'v,
           (('R, 'D) #sync' as 'D) )
         er)
-end
 ```
 
 The `bindings` capability no longer appears in the environment type `'D` and we
 can run it with just the base `Tailrec` interpreter:
 
 ```ocaml
-let () =
-  assert (
-    `Ok (`Num 42)
-    = Tailrec.run Tailrec.sync
-        (Closed.eval
-           (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "x")), `Num 40))))
+  let () =
+    assert (
+      `Ok (`Num 42)
+      = Tailrec.run Tailrec.sync
+          (eval (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "x")), `Num 40))))
 ```
 
-Being able to modularize operations in this fashion is important for modularity.
+Being able to scope effects in this fashion is important for modularity.
 Unfortunately doing so is not free as each projection adds some delegation
 overhead to the effect invocations. Also, what we dealth with above is the easy
 case where we modularized a first-order function. Higher-order functions where
 the caller supplied functions also need to use the environment require wrapping
 the user supplied functions replacing the environment back to what it was.
+
+```ocaml
+end
+```
 
 This concludes the example. We now know more about the extensible environment.
 
@@ -686,7 +721,7 @@ Rea probably should provide a functor for the above, but it currently doesn't.
 The special
 
 ```ml
-external fn : s -> t = "%identity"
+  external fn : s -> t = "%identity"
 ```
 
 construct tells OCaml that `fn` is an external function of type `s -> t` that is
@@ -711,32 +746,31 @@ Now we can write down an interpreter class
       method callcc' f =
         to_rea (Cont.callcc (fun k -> of_rea (f (fun x _ -> to_rea (k x)) d)))
     end
-end
 ```
 
 based on `Cont`. As an example, we can use it with the previously defined
 Fibonacci computations:
 
 ```ocaml
-let () =
-  assert (
-    55 = Cont.run (ContRea.of_rea (run (new ContRea.monad_callcc) (fib 10))))
+  let () =
+    assert (55 = Cont.run (of_rea (run (new monad_callcc) (Fib.inert 10))))
 ```
 
 And `callcc` is also available:
 
 ```ocaml
-let () =
-  assert (
-    101
-    = Cont.run
-        (ContRea.of_rea
-           (run (new ContRea.monad_callcc) (callcc (fun k -> k 101)))))
+  let () =
+    assert (
+      101 = Cont.run (of_rea (run (new monad_callcc) (callcc (fun k -> k 101)))))
 ```
 
 All the generic combinators for monads and simpler functors, and the extensible
 environment are now available when constructing `Cont` computations via the Rea
 framework.
+
+```ocaml
+end
+```
 
 We now know that we can write effect interpreters using existing monadic
 libraries that run their computations embedded into the Rea framework and that
@@ -753,12 +787,15 @@ Indeed, mapping with an effect reader, `map_er`, or "traverse" as it is often
 called, tends to be the answer to many problems. So, let's explore the topic a
 bit. We'll build on the earlier modular interpreter example.
 
+```ocaml
+module Answer = struct
+```
+
 Although we could use a modular approach and build traversal functions modularly
 for expressions, that's not really the point here. So, let's just work on the
 full AST. Here is a generic traversal function for the structural AST:
 
 ```ocaml
-module TheAnswer = struct
   let map_er' nE o1E o2E iE eE = eta'1 @@ function
     | `Num x -> map_er'1 nE        x >>- fun x -> `Num x
     | `Uop x -> map_er'2 o1E eE    x >>- fun x -> `Uop x

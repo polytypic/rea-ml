@@ -2,45 +2,47 @@
 
 open Rea
 
-let rec eager_fib n =
-  if n <= 1 then
-    pure n
-  else
-    lift'2 ( + ) (eager_fib (n - 2)) (eager_fib (n - 1))
+module Fib = struct
+  let rec eager n =
+    if n <= 1 then
+      pure n
+    else
+      lift'2 ( + ) (eager (n - 2)) (eager (n - 1))
 
-let _ =
-  (eager_fib
-    : int ->
-      (< map' : 'e 'a 'b. ('b -> 'a) -> ('R, 'e, 'b, 'D) er -> ('R, 'e, 'a) s
-       ; pair' :
-           'e 'a 'b.
-           ('R, 'e, 'a, 'D) er -> ('R, 'e, 'b, 'D) er -> ('R, 'e, 'a * 'b) s
-       ; pure' : 'e 'a. 'a -> ('R, 'e, 'a) s
-       ; .. >
-       as
-       'D) ->
-      ('R, 'e, int) s)
+  let _ =
+    (eager
+      : int ->
+        (< map' : 'e 'a 'b. ('b -> 'a) -> ('R, 'e, 'b, 'D) er -> ('R, 'e, 'a) s
+         ; pair' :
+             'e 'a 'b.
+             ('R, 'e, 'a, 'D) er -> ('R, 'e, 'b, 'D) er -> ('R, 'e, 'a * 'b) s
+         ; pure' : 'e 'a. 'a -> ('R, 'e, 'a) s
+         ; .. >
+         as
+         'D) ->
+        ('R, 'e, int) s)
 
-let _ =
-  (eager_fib
-    : int ->
-      (< ('R, 'D) map' ; ('R, 'D) pair' ; ('R, 'D) pure' ; .. > as 'D) ->
-      ('R, 'e, int) s)
+  let _ =
+    (eager
+      : int ->
+        (< ('R, 'D) map' ; ('R, 'D) pair' ; ('R, 'D) pure' ; .. > as 'D) ->
+        ('R, 'e, int) s)
 
-let _ = (eager_fib : int -> (('R, 'D) #applicative' as 'D) -> ('R, 'e, int) s)
-let _ = (eager_fib : int -> ('R, 'e, int, (('R, 'D) #applicative' as 'D)) er)
-let () = assert (55 = Identity.of_rea (run Identity.monad (eager_fib 10)))
-let () = assert (`Ok 55 = Tailrec.run Tailrec.sync (eager_fib 10))
+  let _ = (eager : int -> (('R, 'D) #applicative' as 'D) -> ('R, 'e, int) s)
+  let _ = (eager : int -> ('R, 'e, int, (('R, 'D) #applicative' as 'D)) er)
+  let () = assert (55 = Identity.of_rea (run Identity.monad (eager 10)))
+  let () = assert (`Ok 55 = Tailrec.run Tailrec.sync (eager 10))
 
-let rec fib n =
-  eta'0 @@ fun () ->
-  if n <= 1 then
-    pure n
-  else
-    lift'2 ( + ) (fib (n - 2)) (fib (n - 1))
+  let rec inert n =
+    eta'0 @@ fun () ->
+    if n <= 1 then
+      pure n
+    else
+      lift'2 ( + ) (inert (n - 2)) (inert (n - 1))
 
-let () = assert (55 = Identity.of_rea (run Identity.monad (fib 10)))
-let () = assert (`Ok 55 = Tailrec.run Tailrec.sync (fib 10))
+  let () = assert (55 = Identity.of_rea (run Identity.monad (inert 10)))
+  let () = assert (`Ok 55 = Tailrec.run Tailrec.sync (inert 10))
+end
 
 module Num = struct
   type 't t =
@@ -148,44 +150,43 @@ module Full = struct
           'v,
           (< ('R, 'D) sync' ; 'v Lam.bindings ; .. > as 'D) )
         er)
+
+  let () =
+    assert (
+      Error (`Error_unbound_var "y")
+      = StdRea.Result.of_rea
+          (run
+             (object
+                inherit [_] StdRea.Result.monad_errors
+                inherit [_] Lam.bindings
+             end)
+             (eval (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "y")), `Num 1)))))
+
+  let () =
+    assert (
+      `Ok (`Num 3)
+      = Tailrec.run
+          (object
+             inherit [_] Tailrec.sync
+             inherit [_] Lam.bindings
+          end)
+          (eval (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "x")), `Num 1))))
+
+  let () =
+    let result = ref @@ Ok (`Num 0) in
+    Tailrec.spawn
+      (object
+         inherit [_] Tailrec.async
+         inherit [_] Lam.bindings
+      end)
+      (eval (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "x")), `Num 1))
+      |> tryin
+           (fun e -> pure (result := Error e))
+           (fun v -> pure (result := Ok v)));
+    assert (!result = Ok (`Num 3))
 end
 
-let () =
-  assert (
-    Error (`Error_unbound_var "y")
-    = StdRea.Result.of_rea
-        (run
-           (object
-              inherit [_] StdRea.Result.monad_errors
-              inherit [_] Lam.bindings
-           end)
-           (Full.eval
-              (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "y")), `Num 1)))))
-
-let () =
-  assert (
-    `Ok (`Num 3)
-    = Tailrec.run
-        (object
-           inherit [_] Tailrec.sync
-           inherit [_] Lam.bindings
-        end)
-        (Full.eval (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "x")), `Num 1))))
-
-let () =
-  let result = ref @@ Ok (`Num 0) in
-  Tailrec.spawn
-    (object
-       inherit [_] Tailrec.async
-       inherit [_] Lam.bindings
-    end)
-    (Full.eval (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "x")), `Num 1))
-    |> tryin
-         (fun e -> pure (result := Error e))
-         (fun v -> pure (result := Ok v)));
-  assert (!result = Ok (`Num 3))
-
-module Closed = struct
+module Scoped = struct
   let eval e =
     Full.eval e
     |> mapping_env @@ fun o ->
@@ -206,14 +207,13 @@ module Closed = struct
           'v,
           (('R, 'D) #sync' as 'D) )
         er)
-end
 
-let () =
-  assert (
-    `Ok (`Num 42)
-    = Tailrec.run Tailrec.sync
-        (Closed.eval
-           (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "x")), `Num 40))))
+  let () =
+    assert (
+      `Ok (`Num 42)
+      = Tailrec.run Tailrec.sync
+          (eval (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "x")), `Num 40))))
+end
 
 module Cont : sig
   type 'a t
@@ -263,20 +263,16 @@ module ContRea = struct
       method callcc' f =
         to_rea (Cont.callcc (fun k -> of_rea (f (fun x _ -> to_rea (k x)) d)))
     end
+
+  let () =
+    assert (55 = Cont.run (of_rea (run (new monad_callcc) (Fib.inert 10))))
+
+  let () =
+    assert (
+      101 = Cont.run (of_rea (run (new monad_callcc) (callcc (fun k -> k 101)))))
 end
 
-let () =
-  assert (
-    55 = Cont.run (ContRea.of_rea (run (new ContRea.monad_callcc) (fib 10))))
-
-let () =
-  assert (
-    101
-    = Cont.run
-        (ContRea.of_rea
-           (run (new ContRea.monad_callcc) (callcc (fun k -> k 101)))))
-
-module TheAnswer = struct
+module Answer = struct
   let map_er' nE o1E o2E iE eE =
     eta'1 @@ function
     | `Num x -> map_er'1 nE x >>- fun x -> `Num x
