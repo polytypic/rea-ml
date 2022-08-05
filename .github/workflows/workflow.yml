@@ -37,7 +37,7 @@ jobs:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
       - name: Install dependencies
-        run: opam pin . --yes
+        run: opam pin . --with-doc --with-test --yes
 
       - name: Build and test
         run: ./script/ci
