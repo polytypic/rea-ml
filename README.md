@@ -539,6 +539,88 @@ implementation and nothing asynchronous running in the background.
 This concludes the example. We now know about the extensible environment as well
 as about error handling.
 
+### Projections
+
+In the previous section we wrote a simple modular interpreter that used the
+extensible environment of Rea to pass along the bindings capability. Adding to
+the extensible environment is easy &mdash; you just declare what you want. In a
+more complex program different parts of the program might require different
+capabilities. The top-level of the program then ends up having to know about
+about all of those capabilities. This is a modularity problem.
+
+Imagine using a library using the framework. A new version of the library comes
+along and your program no longer compiles just because the library now
+internally needs a different set of capabilities compared to the previous
+version. That is not good. We need a way to handle effects locally. Ideally we'd
+like to be able to say that a program requires a specific set of capabilities to
+run and also requires the freedom to extend the environment with some other
+capabilities (i.e. that it "lacks" or is "disjoint" from the additional
+capabilities). This way the environment could be efficiently extended using some
+form of polymorphic record extension. Unfortunately OCaml's objects do not offer
+such a form of polymorphism. What can we do?
+
+OCaml does offer half of what we need: we can declare that we need at least some
+specific capabilities from the environment. What we can do then is to project
+those capabilities out of the environment and build our own local environment.
+
+Let's see how that is done. Here is a "closed" `eval` function that does not
+require bindings from the environment:
+
+```ocaml
+module Closed = struct
+  let eval e =
+    Full.eval e
+    |> mapping_env @@ fun o ->
+       object
+         inherit [_, _, _] sync'of o
+         inherit [_] Lam.bindings
+       end
+```
+
+The `sync'of` class used above is given an object that must be of some subtype
+of `sync'`. It then provides the `sync'` capabilities by delegating to the given
+object. The `mapping_env` combinator allows us to get the outer environment `o`
+and substitute our own.
+
+The following definition shows a cleaned up type for the closed `eval`:
+
+```ocaml
+  let _ =
+    (eval
+      : ([< 't Num.t | 't Lam.t] as 't) ->
+        ( 'R,
+          [> `Error_attempt_to_apply of
+             ([> `Fun of 'v Lam.Bindings.t * Lam.Id.t * 't | `Num of int] as 'v)
+          | `Error_attempt_to_apply_bop of [`Add | `Mul] * 'v * 'v
+          | `Error_attempt_to_apply_uop of [`Neg] * 'v
+          | `Error_unbound_var of Lam.Id.t ],
+          'v,
+          (('R, 'D) #sync' as 'D) )
+        er)
+end
+```
+
+The `bindings` capability no longer appears in the environment type `'D` and we
+can run it with just the base `Tailrec` interpreter:
+
+```ocaml
+let () =
+  assert (
+    `Ok (`Num 42)
+    = Tailrec.run Tailrec.sync
+        (Closed.eval
+           (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "x")), `Num 40))))
+```
+
+Being able to modularize operations in this fashion is important for modularity.
+Unfortunately doing so is not free as each projection adds some delegation
+overhead to the effect invocations. Also, what we dealth with above is the easy
+case where we modularized a first-order function. Higher-order functions where
+the caller supplied functions also need to use the environment require wrapping
+the user supplied functions replacing the environment back to what it was.
+
+This concludes the example. We now know more about the extensible environment.
+
 ### Interoperability
 
 Let's suppose next that we have an existing monadic library that we need to

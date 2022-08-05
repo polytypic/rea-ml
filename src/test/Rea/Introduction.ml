@@ -185,6 +185,36 @@ let () =
          (fun v -> pure (result := Ok v)));
   assert (!result = Ok (`Num 3))
 
+module Closed = struct
+  let eval e =
+    Full.eval e
+    |> mapping_env @@ fun o ->
+       object
+         inherit [_, _, _] sync'of o
+         inherit [_] Lam.bindings
+       end
+
+  let _ =
+    (eval
+      : ([< 't Num.t | 't Lam.t] as 't) ->
+        ( 'R,
+          [> `Error_attempt_to_apply of
+             ([> `Fun of 'v Lam.Bindings.t * Lam.Id.t * 't | `Num of int] as 'v)
+          | `Error_attempt_to_apply_bop of [`Add | `Mul] * 'v * 'v
+          | `Error_attempt_to_apply_uop of [`Neg] * 'v
+          | `Error_unbound_var of Lam.Id.t ],
+          'v,
+          (('R, 'D) #sync' as 'D) )
+        er)
+end
+
+let () =
+  assert (
+    `Ok (`Num 42)
+    = Tailrec.run Tailrec.sync
+        (Closed.eval
+           (`App (`Lam ("x", `Bop (`Add, `Num 2, `Var "x")), `Num 40))))
+
 module Cont : sig
   type 'a t
 
