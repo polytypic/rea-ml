@@ -813,7 +813,7 @@ type ('R, 'e, 'a, 'b, 'D) par'm = ('R, 'e, 'a, 'b, 'D) pair'm
 (** {!par} effect signature. *)
 class virtual ['R, 'D] par' :
   object
-    method virtual par' : 'e 'a 'b. ('R, 'e, 'a, 'b, 'D) par'm
+    method virtual par' : ('R, 'e, 'a, 'b, 'D) par'm
   end
 
 (** TODO *)
@@ -856,7 +856,7 @@ type ('R, 'e, 'D) spawn'm = ('R, nothing, unit, 'D) er -> ('R, 'e, unit) s
 (** {!spawn} effect capability. *)
 class virtual ['R, 'D] spawn' :
   object
-    method virtual spawn' : 'e. ('R, 'e, 'D) spawn'm
+    method virtual spawn' : ('R, 'e, 'D) spawn'm
   end
 
 (** TODO *)
