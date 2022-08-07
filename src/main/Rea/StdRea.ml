@@ -30,7 +30,7 @@ module List = struct
     eta'1 @@ function
     | [] -> pure []
     | x :: xs as xxs ->
-      let+ y = xyE x and+ ys = map_eq_er xyE xs in
+      xyE x <*> map_eq_er xyE xs >>- fun (y, ys) ->
       if x == y && xs == ys then xxs else y :: ys
 
   let map_eq_er xyE = map_eq_er (eta'1 xyE)

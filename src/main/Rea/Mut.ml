@@ -37,20 +37,20 @@ let read xMV =
   match !xMV with
   | `Ok x -> pure x
   | `Empty _ ->
-    let+ x = wait xMV in
+    wait xMV >>- fun x ->
     fill xMV x;
     x
 
 let mutate fn xMV = map (fn >>> fill xMV) (take xMV)
 
 let modify xya xMV =
-  let+ x = take xMV in
+  take xMV >>- fun x ->
   let x, a = xya x in
   fill xMV x;
   a
 
 let try_mutate xxE xMV =
-  let* x = take xMV in
+  take xMV >>= fun x ->
   eta'1 xxE x
   |> tryin
        (fun e ->
@@ -61,7 +61,7 @@ let try_mutate xxE xMV =
          pure ())
 
 let try_modify xxaE xMV =
-  let* x = take xMV in
+  take xMV >>= fun x ->
   eta'1 xxaE x
   |> tryin
        (fun e ->
