@@ -29,21 +29,22 @@ let rec until n =
 let () =
   assert (
     5
-    = Identity.of_rea
-        ((until 5 >> Counter.get)
+    = (until 5 >> Counter.get
+      |> run
            (object
               inherit [_] Identity.monad
               inherit Counter.d
               inherit Value.d
-           end)))
+           end)
+      |> Identity.of_rea))
 
 let () =
   assert (
     `Ok 5
-    = Tailrec.run
-        (object
-           inherit [_] Tailrec.sync
-           inherit Counter.d
-           inherit Value.d
-        end)
-        (until 5 >> Counter.get))
+    = (until 5 >> Counter.get
+      |> Tailrec.run
+           (object
+              inherit [_] Tailrec.sync
+              inherit Counter.d
+              inherit Value.d
+           end)))

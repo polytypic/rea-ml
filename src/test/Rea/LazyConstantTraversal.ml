@@ -19,50 +19,48 @@ end
 let () =
   assert (
     "101"
-    = Constant.of_rea (map (( + ) 1) (Constant.from "101") Constant.functr))
+    = (Constant.from "101"
+      |> map (( + ) 1)
+      |> run Constant.functr |> Constant.of_rea))
 
 let () =
-  assert (Some 3 = Traverse.to_map Option.map_er (fun x -> x + 2) (Some 1))
+  assert (Some 3 = (Some 1 |> Traverse.to_map Option.map_er @@ fun x -> x + 2))
 
 let () =
   let n_calls = ref 0 in
   assert (
     true
-    = Traverse.to_exists List.map_er
-        (fun x ->
-          incr n_calls;
-          x = 4)
-        [3; 1; 4; 1; 5; 9; 2]);
+    = ([3; 1; 4; 1; 5; 9; 2]
+      |> Traverse.to_exists List.map_er @@ fun x ->
+         incr n_calls;
+         x = 4));
   assert (!n_calls = 3)
 
 let () =
   let n_calls = ref 0 in
   assert (
     Some 4
-    = Traverse.to_find_map List.map_er
-        (fun x ->
-          incr n_calls;
-          if x = 4 then
-            Some 4
-          else
-            None)
-        [3; 1; 4; 1; 5; 9; 2]);
+    = ([3; 1; 4; 1; 5; 9; 2]
+      |> Traverse.to_find_map List.map_er @@ fun x ->
+         incr n_calls;
+         if x = 4 then
+           Some 4
+         else
+           None));
   assert (!n_calls = 3)
 
 let () =
   let n_calls = ref 0 in
   assert (
     Some 4
-    = Identity.of_rea
-        ((Traverse.to_find_map_er List.map_er
-            (fun x ->
-              incr n_calls;
-              if x = 4 then
-                pure @@ Some 4
-              else
-                pure @@ None)
-            [3; 1; 4; 1; 5; 9; 2])
-           Identity.monad));
+    = ([3; 1; 4; 1; 5; 9; 2]
+      |> Traverse.to_find_map_er List.map_er (fun x ->
+             incr n_calls;
+             if x = 4 then
+               pure @@ Some 4
+             else
+               pure @@ None)
+      |> run Identity.monad |> Identity.of_rea));
   assert (!n_calls = 3)
 
 let () =
