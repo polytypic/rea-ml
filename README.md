@@ -609,11 +609,11 @@ Let's see how that is done. Here is an `eval` function that does not require
        end
 ```
 
-The `sync'of` class used above is given an object that must be of some subtype
-of `sync'`. It then provides the `sync'` capabilities by delegating to the given
-object. In other words, it projects the `sync'` capability from the environment.
 The `mapping_env` combinator allows us to get the outer environment `o` and
-substitute our own.
+substitute our own. For that we use the `sync'of` class above. It is given an
+object that must be of some subtype of `sync'`. It then provides the `sync'`
+capabilities by delegating to the given object. In other words, we project the
+`sync'` capability out of the environment `o`.
 
 The following definition shows a cleaned up type for the closed `eval`:
 
