@@ -216,6 +216,9 @@ class ['R, 'O, 'D] pointed'of :
 val pure : 'a -> ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
 (** [pure value] effect. *)
 
+val pure'0 : (unit -> 'a) -> ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
+(** [pure'0 (fun () -> exp)] is equivalent to [eta'0 (fun () -> pure exp)]. *)
+
 val return : 'a -> ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
 (** [return value] is equivalent to [pure value]. *)
 
