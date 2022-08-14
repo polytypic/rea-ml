@@ -219,6 +219,30 @@ val pure : 'a -> ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
 val pure'0 : (unit -> 'a) -> ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
 (** [pure'0 (fun () -> exp)] is equivalent to [eta'0 (fun () -> pure exp)]. *)
 
+val pure'1 : ('b1 -> 'a) -> 'b1 -> ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
+(** TODO *)
+
+val pure'2 :
+  ('b1 -> 'b2 -> 'a) -> 'b1 -> 'b2 -> ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
+(** TODO *)
+
+val pure'3 :
+  ('b1 -> 'b2 -> 'b3 -> 'a) ->
+  'b1 ->
+  'b2 ->
+  'b3 ->
+  ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
+(** TODO *)
+
+val pure'4 :
+  ('b1 -> 'b2 -> 'b3 -> 'b4 -> 'a) ->
+  'b1 ->
+  'b2 ->
+  'b3 ->
+  'b4 ->
+  ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
+(** TODO *)
+
 val return : 'a -> ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
 (** [return value] is equivalent to [pure value]. *)
 

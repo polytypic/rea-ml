@@ -35,6 +35,10 @@ let lift'1 = map
 
 let pure x (d : (_, _) #pure') = d#pure' x
 let pure'0 ux (d : (_, _) #pure') = d#pure' (ux ())
+let pure'1 fn x1 (d : (_, _) #pure') = d#pure' (fn x1)
+let pure'2 fn x1 x2 (d : (_, _) #pure') = d#pure' (fn x1 x2)
+let pure'3 fn x1 x2 x3 (d : (_, _) #pure') = d#pure' (fn x1 x2 x3)
+let pure'4 fn x1 x2 x3 x4 (d : (_, _) #pure') = d#pure' (fn x1 x2 x3 x4)
 let unit (d : (_, _) #pure') = d#pure' ()
 let return = pure
 let do_unless c uM = if c then unit else uM
