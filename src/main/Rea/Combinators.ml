@@ -168,5 +168,9 @@ let gen_error xE = map_error (function (_ : nothing) -> .) xE
 (* *)
 
 let par xE yE (d : (_, _) #par') = d#par' xE yE
+let ( let&* ) = ( let* )
+let ( and&* ) = par
+let ( let&+ ) = ( let+ )
+let ( and&+ ) = par
 let suspend on (d : (_, _) #suspend') = d#suspend' on
 let spawn uE (d : (_, _) #spawn') = d#spawn' uE

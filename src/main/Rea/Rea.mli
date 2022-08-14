@@ -856,6 +856,28 @@ val par :
   ('R, 'e, 'a * 'b, 'D) er
 (** [par xE yE] effect. *)
 
+val ( let&+ ) :
+  ('R, 'e, 'b, (('R, 'D) #map' as 'D)) er -> ('b -> 'a) -> ('R, 'e, 'a, 'D) er
+(** [( let&+ ) xE xy] is equivalent to [map xy xE]. *)
+
+val ( and&+ ) :
+  ('R, 'e, 'a, (('R, 'D) #par' as 'D)) er ->
+  ('R, 'e, 'b, 'D) er ->
+  ('R, 'e, 'a * 'b, 'D) er
+(** [( and&+ ) xE yE] is equivalent to [par xE yE]. *)
+
+val ( let&* ) :
+  ('R, 'e, 'b, (('R, 'D) #bind' as 'D)) er ->
+  ('b -> ('R, 'e, 'a, 'D) er) ->
+  ('R, 'e, 'a, 'D) er
+(** [( let&* ) xE xyE] is equivalent to [bind xyE xE]. *)
+
+val ( and&* ) :
+  ('R, 'e, 'a, (('R, 'D) #par' as 'D)) er ->
+  ('R, 'e, 'b, 'D) er ->
+  ('R, 'e, 'a * 'b, 'D) er
+(** [( and&* ) xE yE] is equivalent to [par xE yE]. *)
+
 type ('R, 'e, 'a, 'D) suspend'm = (('e, 'a) res, unit) cps -> ('R, 'e, 'a) s
 (** {!suspend} effect signature. *)
 
