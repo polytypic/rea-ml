@@ -143,7 +143,7 @@ class virtual ['R, 'D] map' :
     (** Implements the {!map} capability. *)
   end
 
-(** TODO *)
+(** {!map} capability projection. *)
 class ['R, 'O, 'D] map'of :
   ('R, 'O) #map'
   -> object ('D)
@@ -191,7 +191,7 @@ class virtual ['R, 'D] pure' :
     (** Implements the {!pure} capability. *)
   end
 
-(** TODO *)
+(** {!pure} capability projection. *)
 class ['R, 'O, 'D] pure'of :
   ('R, 'O) #pure'
   -> object ('D)
@@ -205,7 +205,7 @@ class virtual ['R, 'D] pointed' :
     inherit ['R, 'D] pure'
   end
 
-(** TODO *)
+(** {!map} and {!pure} capability projection. *)
 class ['R, 'O, 'D] pointed'of :
   ('R, 'O) #pointed'
   -> object ('D)
@@ -220,11 +220,11 @@ val pure'0 : (unit -> 'a) -> ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
 (** [pure'0 (fun () -> exp)] is equivalent to [eta'0 (fun () -> pure exp)]. *)
 
 val pure'1 : ('b1 -> 'a) -> 'b1 -> ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
-(** TODO *)
+(** [pure'1 fn x1] is equivalent to [eta'0 (fun () -> pure (fn x1))]. *)
 
 val pure'2 :
   ('b1 -> 'b2 -> 'a) -> 'b1 -> 'b2 -> ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
-(** TODO *)
+(** [pure'2 fn x1 x2 x3] is equivalent to [eta'0 (fun () -> pure (fn x1 x2))]. *)
 
 val pure'3 :
   ('b1 -> 'b2 -> 'b3 -> 'a) ->
@@ -232,7 +232,7 @@ val pure'3 :
   'b2 ->
   'b3 ->
   ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
-(** TODO *)
+(** [pure'3 fn x1 x2 x3] is equivalent to [eta'0 (fun () -> pure (fn x1 x2 x3))]. *)
 
 val pure'4 :
   ('b1 -> 'b2 -> 'b3 -> 'b4 -> 'a) ->
@@ -241,7 +241,7 @@ val pure'4 :
   'b3 ->
   'b4 ->
   ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
-(** TODO *)
+(** [pure'4 fn x1 x2 x3 x4] is equivalent to [eta'0 (fun () -> pure (fn x1 x2 x3 x4))]. *)
 
 val return : 'a -> ('R, 'e, 'a, (('R, 'D) #pure' as 'D)) er
 (** [return value] is equivalent to [pure value]. *)
@@ -268,7 +268,7 @@ class virtual ['R, 'D] pair' :
     (** Implements the {!pair} capability. *)
   end
 
-(** TODO *)
+(** {!pair} capability projection. *)
 class ['R, 'O, 'D] pair'of :
   ('R, 'O) #pair'
   -> object ('D)
@@ -282,7 +282,7 @@ class virtual ['R, 'D] product' :
     inherit ['R, 'D] pair'
   end
 
-(** TODO *)
+(** {!map} and {!pair} capability projection. *)
 class ['R, 'O, 'D] product'of :
   ('R, 'O) #product'
   -> object ('D)
@@ -298,7 +298,7 @@ class virtual ['R, 'D] applicative' :
     inherit ['R, 'D] pair'
   end
 
-(** TODO *)
+(** {!map}, {!pure}, and {!pair} capability projection. *)
 class ['R, 'O, 'D] applicative'of :
   ('R, 'O) #applicative'
   -> object ('D)
@@ -367,14 +367,14 @@ val tuple'6 :
 (** [tuple'6 x1E x2E x3E x4E x5E x6E] is like {!tuple'3}, but for 6 elements. *)
 
 val map_er'1 : ('b -> 'd -> 'a) -> 'b -> 'd -> 'a
-(** TODO *)
+(** [map_er'1] is a synonym for [eta'1]. *)
 
 val map_er'2 :
   ('b1 -> ('R, 'e, 'a1, (('R, 'D) #product' as 'D)) er) ->
   ('b2 -> ('R, 'e, 'a2, 'D) er) ->
   'b1 * 'b2 ->
   ('R, 'e, 'a1 * 'a2, 'D) er
-(** TODO *)
+(** 2-tuple traversal. *)
 
 val map_er'3 :
   ('b1 -> ('R, 'e, 'a1, (('R, 'D) #product' as 'D)) er) ->
@@ -382,7 +382,7 @@ val map_er'3 :
   ('b3 -> ('R, 'e, 'a3, 'D) er) ->
   'b1 * 'b2 * 'b3 ->
   ('R, 'e, 'a1 * 'a2 * 'a3, 'D) er
-(** TODO *)
+(** 3-tuple traversal. *)
 
 val map_er'4 :
   ('b1 -> ('R, 'e, 'a1, (('R, 'D) #product' as 'D)) er) ->
@@ -391,7 +391,7 @@ val map_er'4 :
   ('b4 -> ('R, 'e, 'a4, 'D) er) ->
   'b1 * 'b2 * 'b3 * 'b4 ->
   ('R, 'e, 'a1 * 'a2 * 'a3 * 'a4, 'D) er
-(** TODO *)
+(** 4-tuple traversal. *)
 
 val map_er'5 :
   ('b1 -> ('R, 'e, 'a1, (('R, 'D) #product' as 'D)) er) ->
@@ -401,7 +401,7 @@ val map_er'5 :
   ('b5 -> ('R, 'e, 'a5, 'D) er) ->
   'b1 * 'b2 * 'b3 * 'b4 * 'b5 ->
   ('R, 'e, 'a1 * 'a2 * 'a3 * 'a4 * 'a5, 'D) er
-(** TODO *)
+(** 5-tuple traversal. *)
 
 val map_er'6 :
   ('b1 -> ('R, 'e, 'a1, (('R, 'D) #product' as 'D)) er) ->
@@ -412,17 +412,17 @@ val map_er'6 :
   ('b6 -> ('R, 'e, 'a6, 'D) er) ->
   'b1 * 'b2 * 'b3 * 'b4 * 'b5 * 'b6 ->
   ('R, 'e, 'a1 * 'a2 * 'a3 * 'a4 * 'a5 * 'a6, 'D) er
-(** TODO *)
+(** 6-tuple traversal. *)
 
 val map_eq_er'1 : ('a -> 'd -> 'a) -> 'a -> 'd -> 'a
-(** TODO *)
+(** [map_eq_er'1] is a synonym for [eta'1]. *)
 
 val map_eq_er'2 :
   ('a1 -> ('R, 'e, 'a1, (('R, 'D) #product' as 'D)) er) ->
   ('a2 -> ('R, 'e, 'a2, 'D) er) ->
   'a1 * 'a2 ->
   ('R, 'e, 'a1 * 'a2, 'D) er
-(** TODO *)
+(** Physical equality preserving 2-tuple traversal. *)
 
 val map_eq_er'3 :
   ('a1 -> ('R, 'e, 'a1, (('R, 'D) #product' as 'D)) er) ->
@@ -430,7 +430,7 @@ val map_eq_er'3 :
   ('a3 -> ('R, 'e, 'a3, 'D) er) ->
   'a1 * 'a2 * 'a3 ->
   ('R, 'e, 'a1 * 'a2 * 'a3, 'D) er
-(** TODO *)
+(** Physical equality preserving 3-tuple traversal. *)
 
 val map_eq_er'4 :
   ('a1 -> ('R, 'e, 'a1, (('R, 'D) #product' as 'D)) er) ->
@@ -439,7 +439,7 @@ val map_eq_er'4 :
   ('a4 -> ('R, 'e, 'a4, 'D) er) ->
   'a1 * 'a2 * 'a3 * 'a4 ->
   ('R, 'e, 'a1 * 'a2 * 'a3 * 'a4, 'D) er
-(** TODO *)
+(** Physical equality preserving 4-tuple traversal. *)
 
 val map_eq_er'5 :
   ('a1 -> ('R, 'e, 'a1, (('R, 'D) #product' as 'D)) er) ->
@@ -449,7 +449,7 @@ val map_eq_er'5 :
   ('a5 -> ('R, 'e, 'a5, 'D) er) ->
   'a1 * 'a2 * 'a3 * 'a4 * 'a5 ->
   ('R, 'e, 'a1 * 'a2 * 'a3 * 'a4 * 'a5, 'D) er
-(** TODO *)
+(** Physical equality preserving 5-tuple traversal. *)
 
 val map_eq_er'6 :
   ('a1 -> ('R, 'e, 'a1, (('R, 'D) #product' as 'D)) er) ->
@@ -460,7 +460,7 @@ val map_eq_er'6 :
   ('a6 -> ('R, 'e, 'a6, 'D) er) ->
   'a1 * 'a2 * 'a3 * 'a4 * 'a5 * 'a6 ->
   ('R, 'e, 'a1 * 'a2 * 'a3 * 'a4 * 'a5 * 'a6, 'D) er
-(** TODO *)
+(** Physical equality preserving 6-tuple traversal. *)
 
 val lift'2 :
   ('b1 -> 'b2 -> 'a) ->
@@ -476,7 +476,7 @@ val lift'3 :
   ('R, 'e, 'b2, 'D) er ->
   ('R, 'e, 'b3, 'D) er ->
   ('R, 'e, 'a, 'D) er
-(** TODO *)
+(** Lift 3-parameter function to operate on effect readers. *)
 
 val lift'4 :
   ('b1 -> 'b2 -> 'b3 -> 'b4 -> 'a) ->
@@ -485,7 +485,7 @@ val lift'4 :
   ('R, 'e, 'b3, 'D) er ->
   ('R, 'e, 'b4, 'D) er ->
   ('R, 'e, 'a, 'D) er
-(** TODO *)
+(** Lift 4-parameter function to operate on effect readers. *)
 
 val lift'5 :
   ('b1 -> 'b2 -> 'b3 -> 'b4 -> 'b5 -> 'a) ->
@@ -495,7 +495,7 @@ val lift'5 :
   ('R, 'e, 'b4, 'D) er ->
   ('R, 'e, 'b5, 'D) er ->
   ('R, 'e, 'a, 'D) er
-(** TODO *)
+(** Lift 5-parameter function to operate on effect readers. *)
 
 val lift'6 :
   ('b1 -> 'b2 -> 'b3 -> 'b4 -> 'b5 -> 'b6 -> 'a) ->
@@ -506,7 +506,7 @@ val lift'6 :
   ('R, 'e, 'b5, 'D) er ->
   ('R, 'e, 'b6, 'D) er ->
   ('R, 'e, 'a, 'D) er
-(** TODO *)
+(** Lift 6-parameter function to operate on effect readers. *)
 
 (** {3 Selective functors} *)
 
@@ -524,7 +524,7 @@ class virtual ['R, 'D] branch' :
     (** Implements the {!val-branch} capability. *)
   end
 
-(** TODO *)
+(** {!val-branch} capability projection. *)
 class ['R, 'O, 'D] branch'of :
   ('R, 'O) #branch'
   -> object ('D)
@@ -539,7 +539,7 @@ class virtual ['R, 'D] selective' :
     inherit ['R, 'D] branch'
   end
 
-(** TODO *)
+(** {!map}, {!pure}, {!pair}, and {!val-branch} capability projection. *)
 class ['R, 'O, 'D] selective'of :
   ('R, 'O) #selective'
   -> object ('D)
@@ -583,7 +583,7 @@ class virtual ['R, 'D] bind' :
     (** Implements the {!bind} capability. *)
   end
 
-(** TODO *)
+(** {!bind} capability projection. *)
 class ['R, 'O, 'D] bind'of :
   ('R, 'O) #bind'
   -> object ('D)
@@ -598,7 +598,7 @@ class virtual ['R, 'D] monad' :
     inherit ['R, 'D] bind'
   end
 
-(** TODO *)
+(** {!map}, {!pure}, {!pair}, {!val-branch}, and {!bind} capability projection. *)
 class ['R, 'O, 'D] monad'of :
   ('R, 'O) #monad'
   -> object ('D)
@@ -660,7 +660,7 @@ val ( >=> ) :
 (** [xyE >=> yzE] is equivalent to [fun x -> bind (xyE x) yzE]. *)
 
 val ( ||| ) : ('R, 'e, bool, (('R, 'D) #monad' as 'D)) er op'2
-(** [lE &&& rE] is equivalent to
+(** [lE ||| rE] is equivalent to
     [bind lE (function true -> pure true | false -> rE)]. *)
 
 val ( &&& ) : ('R, 'e, bool, (('R, 'D) #monad' as 'D)) er op'2
@@ -679,7 +679,7 @@ class virtual ['R, 'D] zero' :
     (** Implements the {!zero} capability. *)
   end
 
-(** TODO *)
+(** {!zero} capability projection. *)
 class ['R, 'O, 'D] zero'of :
   ('R, 'O) #zero'
   -> object ('D)
@@ -697,7 +697,7 @@ class virtual ['R, 'D] alt' :
     (** Implements the {!alt} capability. *)
   end
 
-(** TODO *)
+(** {!alt} capability projection. *)
 class ['R, 'O, 'D] alt'of :
   ('R, 'O) #alt'
   -> object ('D)
@@ -711,7 +711,7 @@ class virtual ['R, 'D] plus' :
     inherit ['R, 'D] alt'
   end
 
-(** TODO *)
+(** {!zero} and {!alt} capability projection. *)
 class ['R, 'O, 'D] plus'of :
   ('R, 'O) #plus'
   -> object ('D)
@@ -730,13 +730,13 @@ val ( <|> ) : ('R, 'e, 'a, (('R, 'D) #alt' as 'D)) er op'2
 
 val iota :
   int -> ('R, 'e, int, (< ('R, 'D) pure' ; ('R, 'D) plus' ; .. > as 'D)) er
-(** TODO *)
+(** [iota n] is equivalent to [zero <|> pure 0 <|> ... <|> pure (n-1)]. *)
 
 val filter :
   ('a -> bool) ->
   ('R, 'e, 'a, (< ('R, 'D) monad' ; ('R, 'D) zero' ; .. > as 'D)) er ->
   ('R, 'e, 'a, 'D) er
-(** TODO *)
+(** [filter p]  *)
 
 (** {3 Error handling} *)
 
@@ -750,7 +750,7 @@ class virtual ['R, 'D] fail' :
     (** Implements the {!fail} capability. *)
   end
 
-(** TODO *)
+(** {!fail} capability projection. *)
 class virtual ['R, 'O, 'D] fail'of :
   ('R, 'O) #fail'
   -> object ('D)
@@ -771,7 +771,7 @@ class virtual ['R, 'D] tryin' :
     (** Implements the {!tryin} capability. *)
   end
 
-(** TODO *)
+(** {!tryin} capability projection. *)
 class virtual ['R, 'O, 'D] tryin'of :
   ('R, 'O) #tryin'
   -> object ('D)
@@ -785,7 +785,7 @@ class virtual ['R, 'D] errors' :
     inherit ['R, 'D] tryin'
   end
 
-(** TODO *)
+(** {!fail} and {!tryin} capability projection. *)
 class virtual ['R, 'O, 'D] errors'of :
   ('R, 'O) #errors'
   -> object ('D)
@@ -843,7 +843,7 @@ class virtual ['R, 'D] par' :
     method virtual par' : ('R, 'e, 'a, 'b, 'D) par'm
   end
 
-(** TODO *)
+(** {!par} capability projection. *)
 class ['R, 'O, 'D] par'of :
   ('R, 'O) #par'
   -> object ('D)
@@ -888,7 +888,7 @@ class virtual ['R, 'D] suspend' :
     (** Implements the {!suspend} capability. *)
   end
 
-(** TODO *)
+(** {!suspend} capability projection. *)
 class ['R, 'O, 'D] suspend'of :
   ('R, 'O) #suspend'
   -> object ('D)
@@ -908,21 +908,21 @@ class virtual ['R, 'D] spawn' :
     method virtual spawn' : ('R, 'e, 'D) spawn'm
   end
 
-(** TODO *)
+(** {!spawn} capability projection. *)
 class ['R, 'O, 'D] spawn'of :
   ('R, 'O) #spawn'
   -> object ('D)
        method spawn' : ('R, 'e, 'D) spawn'm
      end
 
-(** TODO *)
+(** {!monad'} and {!errors'} effect capabilities. *)
 class virtual ['R, 'D] sync' :
   object
     inherit ['R, 'D] monad'
     inherit ['R, 'D] errors'
   end
 
-(** TODO *)
+(** {!sync'} capability projection. *)
 class ['R, 'O, 'D] sync'of :
   ('R, 'O) #sync'
   -> object ('D)
@@ -935,7 +935,7 @@ class ['R, 'O, 'D] sync'of :
        method tryin' : ('R, 'e, 'f, 'a, 'b, 'D) tryin'm
      end
 
-(** TODO *)
+(** {!monad'}, {!errors'}, {!suspend'}, {!par'}, and {!spawn'} effect capabilites. *)
 class virtual ['R, 'D] async' :
   object
     inherit ['R, 'D] sync'
@@ -944,7 +944,7 @@ class virtual ['R, 'D] async' :
     inherit ['R, 'D] spawn'
   end
 
-(** TODO *)
+(** {!async'} capability projection. *)
 class ['R, 'O, 'D] async'of :
   ('R, 'O) #async'
   -> object ('D)
@@ -1172,32 +1172,32 @@ val cloning :
 
 (** {3 for Stdlib} *)
 
-(** TODO *)
+(** [Stdlib] extension modules. *)
 module StdRea : sig
-  (** TODO *)
+  (** [Stdlib.List] extensions. *)
   module List : sig
     val map_er :
       ('a -> ('R, 'e, 'b, (('R, 'D) #applicative' as 'D)) er) ->
       'a List.t ->
       ('R, 'e, 'b List.t, 'D) er
-    (** TODO *)
+    (** [List] traversal. *)
 
     val map_eq_er :
       ('a -> ('R, 'e, 'a, (('R, 'D) #applicative' as 'D)) er) ->
       'a List.t ->
       ('R, 'e, 'a List.t, 'D) er
-    (** TODO *)
+    (** Physical equality preserving [List] traversal. *)
 
     type r
-    (** TODO *)
+    (** Abstract effect representation for [List]. *)
 
     val to_rea : 'a List.t -> (r, 'e, 'a) s
-    (** TODO *)
+    (** [List] injection. *)
 
     val of_rea : (r, 'e, 'a) s -> 'a List.t
-    (** TODO *)
+    (** [List] projection. *)
 
-    (** TODO *)
+    (** Base [List] interpreter dictionary. *)
     class ['D] monad_plus :
       object ('D)
         method map' : (r, 'e, 'a, 'b, 'D) map'm
@@ -1210,33 +1210,33 @@ module StdRea : sig
       end
 
     val monad_plus : 'D monad_plus as 'D
-    (** TODO *)
+    (** Default {!class-monad_plus} dictionary. *)
   end
 
-  (** TODO *)
+  (** [Stdlib.Option] extensions. *)
   module Option : sig
     val map_er :
       ('a -> ('R, 'e, 'b, (('R, 'D) #pointed' as 'D)) er) ->
       'a Option.t ->
       ('R, 'e, 'b Option.t, 'D) er
-    (** TODO *)
+    (** [Option] traversal. *)
 
     val map_eq_er :
       ('a -> ('R, 'e, 'a, (('R, 'D) #pointed' as 'D)) er) ->
       'a Option.t ->
       ('R, 'e, 'a Option.t, 'D) er
-    (** TODO *)
+    (** Physical equality preserving [Option] traversal. *)
 
     type r
-    (** TODO *)
+    (** Abstract effect representation for [Option]. *)
 
     val to_rea : 'a Option.t -> (r, 'e, 'a) s
-    (** TODO *)
+    (** [Option] injection. *)
 
     val of_rea : (r, 'e, 'a) s -> 'a Option.t
-    (** TODO *)
+    (** [Option] projection. *)
 
-    (** TODO *)
+    (** Base [Option] interpreter dictionary. *)
     class ['D] monad_plus :
       object ('D)
         method map' : (r, 'e, 'a, 'b, 'D) map'm
@@ -1249,21 +1249,21 @@ module StdRea : sig
       end
 
     val monad_plus : 'D monad_plus as 'D
-    (** TODO *)
+    (** Default {!class-monad_plus} dictionary. *)
   end
 
-  (** TODO *)
+  (** [Stdlib.Result] extensions. *)
   module Result : sig
     type r
-    (** TODO *)
+    (** Abstract effect representation for [Result]. *)
 
     val to_rea : ('a, 'e) Result.t -> (r, 'e, 'a) s
-    (** TODO *)
+    (** [Result] injection. *)
 
     val of_rea : (r, 'e, 'a) s -> ('a, 'e) Result.t
-    (** TODO *)
+    (** [Result] projection. *)
 
-    (** TODO *)
+    (** Base [Result] interpreter dictionary. *)
     class ['D] monad_errors :
       object ('D)
         method map' : (r, 'e, 'a, 'b, 'D) map'm
@@ -1276,27 +1276,27 @@ module StdRea : sig
       end
 
     val monad_errors : 'D monad_errors as 'D
-    (** TODO *)
+    (** Default {!class-monad_errors} dictionary. *)
   end
 
-  (** TODO *)
+  (** [Stdlib.Seq] extensions. *)
   module Seq : sig
     val map_er :
       ('a -> ('R, 'e, 'b, (('R, 'D) #applicative' as 'D)) er) ->
       'a Seq.t ->
       ('R, 'e, 'b Seq.t, 'D) er
-    (** TODO *)
+    (** [Seq] traversal. *)
 
     type r
-    (** TODO *)
+    (** Abstract effect representation for [Seq]. *)
 
     val to_rea : 'a Seq.t -> (r, 'e, 'a) s
-    (** TODO *)
+    (** [Seq] injection. *)
 
     val of_rea : (r, 'e, 'a) s -> 'a Seq.t
-    (** TODO *)
+    (** [Seq] projection. *)
 
-    (** TODO *)
+    (** Base [Seq] interpreter dictionary. *)
     class ['D] monad_plus :
       object ('D)
         method map' : (r, 'e, 'a, 'b, 'D) map'm
@@ -1309,7 +1309,7 @@ module StdRea : sig
       end
 
     val monad_plus : 'D monad_plus as 'D
-    (** TODO *)
+    (** Default {!class-monad_plus} dictionary. *)
   end
 end
 
@@ -1318,18 +1318,18 @@ end
 (** Constant functor, products, and applicatives. *)
 module Constant : sig
   type 'c r
-  (** Abstract higher-kinded effect representation type constructor. *)
+  (** Abstract effect representation for [Constant]. *)
 
   val to_rea : 'c -> ('c r, 'e, 'a) s
-  (** TODO *)
+  (** [Constant] injection. *)
 
   val of_rea : ('c r, 'e, 'a) s -> 'c
-  (** TODO *)
+  (** [Constant] projection. *)
 
   val from : 'c -> ('c r, 'e, 'a, 'D) er
   (** [from value] has no effect aside from encapsulating the given [value]. *)
 
-  (** {4 Constant functr} *)
+  (** {4 Constant functor} *)
 
   (** Base constant functor interpreter dictionary. *)
   class ['c, 'D] functr :
@@ -1370,7 +1370,7 @@ module Constant : sig
   (** {4 User defined} *)
 
   val map : 'D -> ('c r, 'e, 'a, 'b, 'D) map'm
-  (** Use to implement the {!map} capability for a constant functr. *)
+  (** Use to implement the {!map} capability for a constant functor. *)
 
   val pure_of : 'c -> ('c r, 'e, 'a, 'D) pure'm
   (** Use to implement the {!pure} capability for a constant with the given
@@ -1381,7 +1381,7 @@ module Constant : sig
       binary [combine] operator. *)
 
   (** [new product combine] creates the dictionary for a constant product
-      functr. *)
+      functor. *)
   class ['c, 'D] product :
     'c lazy_op'2
     -> object ('D)
@@ -1390,7 +1390,7 @@ module Constant : sig
        end
 
   (** [new applicative identity combine] creates the dictionary for a constant
-      applicative functr. *)
+      applicative functor. *)
   class ['c, 'D] applicative :
     'c
     -> 'c lazy_op'2
@@ -1404,15 +1404,15 @@ end
 (** Identity monad. *)
 module Identity : sig
   type r
-  (** Abstract higher-kinded effect representation type constructor. *)
+  (** Abstract effect representation for [Identity]. *)
 
   val to_rea : 'a -> (r, 'e, 'a) s
-  (** TODO *)
+  (** [Identity] injection. *)
 
   val of_rea : (r, 'e, 'a) s -> 'a
-  (** TODO *)
+  (** [Identity] projection. *)
 
-  (** Base identity monad dictionary. *)
+  (** Base [Identity] interpreter dictionary. *)
   class ['D] monad :
     object ('D)
       method map' : (r, 'e, 'a, 'b, 'D) map'm
@@ -1432,9 +1432,9 @@ end
     https://ocsigen.org/js_of_ocaml/latest/manual/tailcall} Js_of_ocaml}. *)
 module Tailrec : sig
   type r
-  (** Abstract higher-kinded effect representation type constructor. *)
+  (** Abstract effect representation for [Tailrec]. *)
 
-  (** Base synchronous interpreter dictionary. *)
+  (** Base synchronous [Tailrec] interpreter dictionary. *)
   class ['D] sync :
     object ('D)
       method map' : (r, 'e, 'a, 'b, 'D) map'm
@@ -1456,7 +1456,7 @@ module Tailrec : sig
   (** [run d sync] executes the [sync] effect with the given interpreter [d] and
       returns its result. *)
 
-  (** Base asynchronous interpreter dictionary. *)
+  (** Base asynchronous [Tailrec] interpreter dictionary. *)
   class ['D] async :
     object ('D)
       method map' : (r, 'e, 'a, 'b, 'D) map'm
@@ -1481,7 +1481,7 @@ end
 
 (** {2 Traversals} *)
 
-(** TODO *)
+(** Data type traversal use cases. *)
 module Traverse : sig
   val to_map :
     (('b -> ((Identity.r as 'R), 'e, 'a, 'D) er) ->
@@ -1490,7 +1490,7 @@ module Traverse : sig
     ('b -> 'a) ->
     't ->
     's
-  (** TODO *)
+  (** Convert traversal to [map]. *)
 
   val to_set :
     (('b -> ((Identity.r as 'R), 'e, 'a, 'D) er) ->
@@ -1499,7 +1499,7 @@ module Traverse : sig
     'a ->
     't ->
     's
-  (** TODO *)
+  (** Convert traversal to [set]. *)
 
   val to_map_constant :
     (('b -> (('c Constant.r as 'R), 'e, 'a, 'D) er) ->
@@ -1509,6 +1509,7 @@ module Traverse : sig
     ('b -> 'c) ->
     't ->
     'c
+  (** Convert traversal to map with constant. *)
 
   val to_get :
     (('c -> (('c Constant.r as 'R), 'e, 'a, 'D) er) ->
@@ -1516,7 +1517,7 @@ module Traverse : sig
     ('R, 'e, 's, (('R, 'D) functr' as 'D)) er) ->
     't ->
     'c
-  (** TODO *)
+  (** Convert traversal to [get]. *)
 
   val to_get_opt :
     (('c -> (('c option Constant.r as 'R), 'e, 'a, 'D) er) ->
@@ -1524,7 +1525,7 @@ module Traverse : sig
     ('R, 'e, 's, (('R, 'D) applicative' as 'D)) er) ->
     't ->
     'c option
-  (** TODO *)
+  (** Convert traversal to [get_opt]. *)
 
   val to_exists :
     (('b -> ((bool Constant.r as 'R), 'e, 'a, 'D) er) ->
@@ -1533,7 +1534,7 @@ module Traverse : sig
     ('b -> bool) ->
     't ->
     bool
-  (** TODO *)
+  (** Convert traversal to [exists]. *)
 
   val to_find_map :
     (('b -> (('c option Constant.r as 'R), 'e, 'a, 'D) er) ->
@@ -1542,7 +1543,7 @@ module Traverse : sig
     ('b -> 'c option) ->
     't ->
     'c option
-  (** TODO *)
+  (** Convert traversal to [find_map]. *)
 
   val to_map_reduce :
     (('b -> (('c Constant.r as 'R), 'e, 'a, 'D) er) ->
@@ -1553,7 +1554,7 @@ module Traverse : sig
     ('b -> 'c) ->
     't ->
     'c
-  (** TODO *)
+  (** Convert traversal to [map_reduce]. *)
 
   val to_iter_er :
     (('b -> (('c Constant.r as 'R), 'e, 'a, 'D) er) ->
@@ -1562,7 +1563,7 @@ module Traverse : sig
     ('b -> (('Ru, 'eu, unit, (('Ru, 'Du) #monad' as 'Du)) er as 'c)) ->
     't ->
     'c
-  (** TODO *)
+  (** Convert traversal to [iter_er]. *)
 
   val to_exists_er :
     (('b -> (('c Constant.r as 'R), 'e, 'a, 'D) er) ->
@@ -1571,7 +1572,7 @@ module Traverse : sig
     ('b -> (('Ru, 'eu, bool, (('Ru, 'Du) #monad' as 'Du)) er as 'c)) ->
     't ->
     'c
-  (** TODO *)
+  (** Convert traversal to [exists_er]. *)
 
   val to_find_map_er :
     (('b -> (('c Constant.r as 'R), 'e, 'a, 'D) er) ->
@@ -1580,5 +1581,5 @@ module Traverse : sig
     ('b -> (('Ru, 'eu, 'x option, (('Ru, 'Du) #monad' as 'Du)) er as 'c)) ->
     't ->
     'c
-  (** TODO *)
+  (** Convert traversal to [find_map_er]. *)
 end
