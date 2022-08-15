@@ -49,21 +49,23 @@ let do_when c uM = if c then uM else unit
 let pair xE yE (d : (_, _) #pair') = d#pair' xE yE
 let ( and+ ) = pair
 let ( <*> ) = pair
+let[@inline] nest'3 x1 x2 x3 = x1 <*> pair x2 x3
+let[@inline] nest'4 x1 x2 x3 x4 = x1 <*> nest'3 x2 x3 x4
+let[@inline] nest'5 x1 x2 x3 x4 x5 = x1 <*> nest'4 x2 x3 x4 x5
+let[@inline] nest'6 x1 x2 x3 x4 x5 x6 = x1 <*> nest'5 x2 x3 x4 x5 x6
 let tuple'2 = pair
+let tuple'3 x1 x2 x3 = nest'3 x1 x2 x3 >>- fun (x1, (x2, x3)) -> (x1, x2, x3)
 
-let tuple'3 x1E x2E x3E =
-  x1E <*> x2E <*> x3E >>- fun ((x1, x2), x3) -> (x1, x2, x3)
+let tuple'4 x1 x2 x3 x4 =
+  nest'4 x1 x2 x3 x4 >>- fun (x1, (x2, (x3, x4))) -> (x1, x2, x3, x4)
 
-let tuple'4 x1E x2E x3E x4E =
-  x1E <*> x2E <*> x3E <*> x4E >>- fun (((x1, x2), x3), x4) -> (x1, x2, x3, x4)
-
-let tuple'5 x1E x2E x3E x4E x5E =
-  x1E <*> x2E <*> x3E <*> x4E <*> x5E >>- fun ((((x1, x2), x3), x4), x5) ->
+let tuple'5 x1 x2 x3 x4 x5 =
+  nest'5 x1 x2 x3 x4 x5 >>- fun (x1, (x2, (x3, (x4, x5)))) ->
   (x1, x2, x3, x4, x5)
 
-let tuple'6 x1E x2E x3E x4E x5E x6E =
-  x1E <*> x2E <*> x3E <*> x4E <*> x5E <*> x6E
-  >>- fun (((((x1, x2), x3), x4), x5), x6) -> (x1, x2, x3, x4, x5, x6)
+let tuple'6 x1 x2 x3 x4 x5 x6 =
+  nest'6 x1 x2 x3 x4 x5 x6 >>- fun (x1, (x2, (x3, (x4, (x5, x6))))) ->
+  (x1, x2, x3, x4, x5, x6)
 
 let map_er'1 = eta'1
 let map_er'2 f1 f2 (x1, x2) = tuple'2 (eta'1 f1 x1) (eta'1 f2 x2)
@@ -84,44 +86,46 @@ let map_er'6 f1 f2 f3 f4 f5 f6 (x1, x2, x3, x4, x5, x6) =
 let map_eq_er'1 = map_er'1
 
 let map_eq_er'2 f1 f2 ((x1, x2) as x) =
-  f1 x1 <*> f2 x2 >>- fun (y1, y2) ->
+  tuple'2 (eta'1 f1 x1) (eta'1 f2 x2) >>- fun (y1, y2) ->
   if x1 == y1 && x2 == y2 then x else (y1, y2)
 
 let map_eq_er'3 f1 f2 f3 ((x1, x2, x3) as x) =
-  f1 x1 <*> f2 x2 <*> f3 x3 >>- fun ((y1, y2), y3) ->
+  nest'3 (eta'1 f1 x1) (eta'1 f2 x2) (eta'1 f3 x3) >>- fun (y1, (y2, y3)) ->
   if x1 == y1 && x2 == y2 && x3 == y3 then x else (y1, y2, y3)
 
 let map_eq_er'4 f1 f2 f3 f4 ((x1, x2, x3, x4) as x) =
-  f1 x1 <*> f2 x2 <*> f3 x3 <*> f4 x4 >>- fun (((y1, y2), y3), y4) ->
+  nest'4 (eta'1 f1 x1) (eta'1 f2 x2) (eta'1 f3 x3) (eta'1 f4 x4)
+  >>- fun (y1, (y2, (y3, y4))) ->
   if x1 == y1 && x2 == y2 && x3 == y3 && x4 == y4 then x else (y1, y2, y3, y4)
 
 let map_eq_er'5 f1 f2 f3 f4 f5 ((x1, x2, x3, x4, x5) as x) =
-  f1 x1 <*> f2 x2 <*> f3 x3 <*> f4 x4 <*> f5 x5
-  >>- fun ((((y1, y2), y3), y4), y5) ->
+  nest'5 (eta'1 f1 x1) (eta'1 f2 x2) (eta'1 f3 x3) (eta'1 f4 x4) (eta'1 f5 x5)
+  >>- fun (y1, (y2, (y3, (y4, y5)))) ->
   if x1 == y1 && x2 == y2 && x3 == y3 && x4 == y4 && x5 == y5 then x
   else (y1, y2, y3, y4, y5)
 
 let map_eq_er'6 f1 f2 f3 f4 f5 f6 ((x1, x2, x3, x4, x5, x6) as x) =
-  f1 x1 <*> f2 x2 <*> f3 x3 <*> f4 x4 <*> f5 x5 <*> f6 x6
-  >>- fun (((((y1, y2), y3), y4), y5), y6) ->
+  nest'6 (eta'1 f1 x1) (eta'1 f2 x2) (eta'1 f3 x3) (eta'1 f4 x4) (eta'1 f5 x5)
+    (eta'1 f6 x6)
+  >>- fun (y1, (y2, (y3, (y4, (y5, y6))))) ->
   if x1 == y1 && x2 == y2 && x3 == y3 && x4 == y4 && x5 == y5 && x6 == y6 then x
   else (y1, y2, y3, y4, y5, y6)
 
-let lift'2 x1x2y x1 x2 = x1 <*> x2 >>- fun (x1, x2) -> x1x2y x1 x2
+let lift'2 x1x2y x1 x2 = tuple'2 x1 x2 >>- fun (x1, x2) -> x1x2y x1 x2
 
 let lift'3 x1x2x3y x1 x2 x3 =
-  x1 <*> x2 <*> x3 >>- fun ((x1, x2), x3) -> x1x2x3y x1 x2 x3
+  nest'3 x1 x2 x3 >>- fun (x1, (x2, x3)) -> x1x2x3y x1 x2 x3
 
 let lift'4 x1x2x3x4y x1 x2 x3 x4 =
-  x1 <*> x2 <*> x3 <*> x4 >>- fun (((x1, x2), x3), x4) -> x1x2x3x4y x1 x2 x3 x4
+  nest'4 x1 x2 x3 x4 >>- fun (x1, (x2, (x3, x4))) -> x1x2x3x4y x1 x2 x3 x4
 
 let lift'5 x1x2x3x4x5y x1 x2 x3 x4 x5 =
-  x1 <*> x2 <*> x3 <*> x4 <*> x5 >>- fun ((((x1, x2), x3), x4), x5) ->
+  nest'5 x1 x2 x3 x4 x5 >>- fun (x1, (x2, (x3, (x4, x5)))) ->
   x1x2x3x4x5y x1 x2 x3 x4 x5
 
 let lift'6 x1x2x3x4x5x6y x1 x2 x3 x4 x5 x6 =
-  x1 <*> x2 <*> x3 <*> x4 <*> x5 <*> x6
-  >>- fun (((((x1, x2), x3), x4), x5), x6) -> x1x2x3x4x5x6y x1 x2 x3 x4 x5 x6
+  nest'6 x1 x2 x3 x4 x5 x6 >>- fun (x1, (x2, (x3, (x4, (x5, x6))))) ->
+  x1x2x3x4x5x6y x1 x2 x3 x4 x5 x6
 
 (* *)
 
