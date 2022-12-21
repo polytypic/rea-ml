@@ -9,7 +9,6 @@ main() {
   extract-test-from-readme
   extract-test-from-signature
   generate-build-files
-  build-and-test
   if [ "$CI" = true ]; then
     PROFILE='' build-and-test
     clean
