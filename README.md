@@ -902,8 +902,8 @@ start using the framework. Have fun!
 
 ## Limitations
 
-The main drawbacks of this approach come from the deficiencies and limitations
-of OCaml's objects:
+The main drawbacks of this approach come from the limitations of OCaml's
+objects:
 
 - OCaml does not aggressively optimize (statically known) method invocations.
   This means that every effect invocation has some overhead.
