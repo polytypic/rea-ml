@@ -913,8 +913,8 @@ objects:
   cannot be easily handled locally.
 
 On the other hand, this approach arguably has a rather straightforward
-implementation and is convenient to use (modulo the inability to handle effects
-locally).
+implementation and is convenient to use (modulo the difficulty of handling
+effects locally).
 
 Unfortunately the library
 [reference manual](https://polytypic.github.io/rea-ml/rea/Rea/index.html) is
