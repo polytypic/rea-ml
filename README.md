@@ -33,6 +33,16 @@ convenience features, but it seems a library like this could have already been
 written for OCaml 3 (released in 2000). All the elements of this approach have
 been known at least since 2014.
 
+## Contents
+
+- [Introduction](#introduction)
+  - [Basics](#basics)
+  - [Extensible environment](#extensible-environment)
+  - [Projections](#projections)
+  - [Interoperability](#interoperability)
+  - [Traversals](#traversals)
+- [Limitations](#limitations)
+
 ## Introduction
 
 The following subsections introduce some aspects of the Rea framework via simple
