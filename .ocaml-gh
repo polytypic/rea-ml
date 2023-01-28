@@ -1,21 +1,15 @@
 #!/bin/bash
 
-# shellcheck source=common
-. "${BASH_SOURCE%/*}/common"
+export PROJECT=rea-ml
+export GIT_DEPS=()
+export GIT=git@github.com:polytypic/$PROJECT.git
 
-main() {
-  local TEST_DIR=src/test/Rea/
+export TEST_DIR=src/test/Rea
 
+ocaml-gh-ci-before() {
   extract-test-from-readme
   extract-test-from-signature
   generate-build-files
-  if [ "$CI" = true ]; then
-    PROFILE='' build-and-test
-    clean
-  fi
-  PROFILE=release build-and-test
-  build-docs
-  check-git-clean
 }
 
 extract-test-from-readme() {
@@ -57,38 +51,11 @@ generate-build-files() {
  (libraries Rea))"
 }
 
-build-and-test() {
-  OPTS=(--root=.)
-
-  if [ -n "$PROFILE" ]; then
-     OPTS+=(--profile "$PROFILE")
-  fi
-
-  folded "Building" \
-    opam exec -- dune build "${OPTS[@]}"
-
-  folded "Testing" \
-    opam exec -- dune test "${OPTS[@]}"
-}
-
-clean() {
-  folded "Cleaning" \
-    opam exec -- dune clean
-}
-
-build-docs() {
-  folded "Build docs" \
-    opam exec -- dune build @doc --root=.
-}
-
-check-git-clean() {
-  if [ "$CI" = true ]; then
-    if [[ $(git status --porcelain) ]] ; then
-      git status
-      git diff
-      exit 1
-    fi
+update-file-content() {
+  local FILE="$1"
+  local CONTENT="$2"
+  if ! [ -f "$FILE" ] || \
+      [ "$(cat "$FILE")" != "$CONTENT" ] ; then
+    echo "$CONTENT" > "$FILE"
   fi
 }
-
-main

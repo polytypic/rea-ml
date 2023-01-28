@@ -907,8 +907,8 @@ end
 
 We now know about most aspects of the Rea framework. Perhaps the best way to
 learn more is to take a brief look at the
-[reference manual](https://polytypic.github.io/rea-ml/rea/Rea/index.html) and
-start using the framework. Have fun!
+[reference manual](https://polytypic.github.io/rea-ml/main/api/rea/Rea/index.html)
+and start using the framework. Have fun!
 
 ## Limitations
 
@@ -927,5 +927,5 @@ implementation and is convenient to use (modulo the difficulty of handling
 effects locally).
 
 Unfortunately the library
-[reference manual](https://polytypic.github.io/rea-ml/rea/Rea/index.html) is
-rather unfinished at the moment.
+[reference manual](https://polytypic.github.io/rea-ml/main/api/rea/Rea/index.html)
+is rather unfinished at the moment.
