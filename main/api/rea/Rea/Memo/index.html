@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Memo (rea.Rea.Memo)</title><link rel="stylesheet" href="../../../odoc.css"/><meta charset="utf-8"/><meta name="generator" content="odoc 2.2.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><script src="../../../highlight.pack.js"></script><script>hljs.initHighlightingOnLoad();</script></head><body class="odoc"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../index.html">rea</a> &#x00BB; <a href="../index.html">Rea</a> &#x00BB; Memo</nav><header class="odoc-preamble"><h1>Module <code><span>Rea.Memo</span></code></h1><p>Memoized lazy computation for asynchronous programming.</p></header><div class="odoc-content"><div class="odoc-spec"><div class="spec type anchored" id="type-t"><a href="#type-t" class="anchor"></a><code><span><span class="keyword">type</span> <span>('R, 'e, 'a) t</span></span></code></div><div class="spec-doc"><p>Represents a memoized lazy computation.</p></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-create"><a href="#val-create" class="anchor"></a><code><span><span class="keyword">val</span> create : 
+  <span><span><span>(<span class="type-var">'R</span>,
+    <span class="type-var">'f</span>,
+    <span class="type-var">'a</span>,
+    <span>&lt; <span><span>(<span class="type-var">'R</span>, <span class="type-var">'D</span>)</span> <a href="../class-monad'/index.html">monad'</a></span>
+    ; <span><span>(<span class="type-var">'R</span>, <span class="type-var">'D</span>)</span> <a href="../class-errors'/index.html">errors'</a></span>
+    ; <span><span>(<span class="type-var">'R</span>, <span class="type-var">'D</span>)</span> <a href="../class-suspend'/index.html">suspend'</a></span>.. &gt;</span> <span class="keyword">as</span> 'D)</span>
+    <a href="../index.html#type-er">er</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(<span class="type-var">'R</span>, <span class="type-var">'e</span>, <span><span>(<span class="type-var">'R</span>, <span class="type-var">'f</span>, <span class="type-var">'a</span>)</span> <a href="#type-t">t</a></span>, <span class="type-var">'D</span>)</span> <a href="../index.html#type-er">er</a></span></span></code></div><div class="spec-doc"><p><code>create eaE</code> effect returns a memoized lazy computation.</p></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-eval"><a href="#val-eval" class="anchor"></a><code><span><span class="keyword">val</span> eval : 
+  <span><span><span>(<span class="type-var">'R</span>, <span class="type-var">'e</span>, <span class="type-var">'a</span>)</span> <a href="#type-t">t</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(<span class="type-var">'R</span>,
+    <span class="type-var">'e</span>,
+    <span class="type-var">'a</span>,
+    <span>&lt; <span><span>(<span class="type-var">'R</span>, <span class="type-var">'D</span>)</span> <a href="../class-monad'/index.html">monad'</a></span>
+    ; <span><span>(<span class="type-var">'R</span>, <span class="type-var">'D</span>)</span> <a href="../class-errors'/index.html">errors'</a></span>
+    ; <span><span>(<span class="type-var">'R</span>, <span class="type-var">'D</span>)</span> <a href="../class-suspend'/index.html">suspend'</a></span>.. &gt;</span> <span class="keyword">as</span> 'D)</span>
+    <a href="../index.html#type-er">er</a></span></span></code></div><div class="spec-doc"><p><code>eval eaM</code> effect executes the effect and memoizes its result or produces the memoized result.</p></div></div></div></body></html>
